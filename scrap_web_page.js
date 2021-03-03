@@ -8,7 +8,7 @@ javascript: (function () {
   let href = window.location.href;
   let title = window.prompt(
     "Bookmark to Scrapbox",
-    "[" + document.title + " " + href + "]"
+    document.title + " " + href
   );
   if (title == null) return;
   let document_title_str = document.title.replace("[", "").replace("]", "");
