@@ -27,6 +27,7 @@ javascript: (function () {
 
   const domains = {
     TWITTER: "twitter.com",
+    TWITTER_MOBILE: "mobile.twitter.com",
     OTHER: "",
   };
 
@@ -65,10 +66,11 @@ javascript: (function () {
   let img_href_array;
   switch (domain) {
     case domains.TWITTER:
+    case domains.TWITTER_MOBILE:
       function get_twitter_image_hrefs(images) {
         let img_href_array = [];
         images.forEach(function (img) {
-          if (img.alt == "Image") {
+          if (img.alt == "Image" || img.alt == "画像") {
             let img_url = new URL(img.src);
             img_href_array.push(img_url.origin + img_url.pathname + ".jpg");
           }
