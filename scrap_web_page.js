@@ -6,10 +6,7 @@ javascript: (function () {
   comment = "// Get the Web Page Information //";
 
   let href = window.location.href;
-  let title = window.prompt(
-    "Bookmark to Scrapbox",
-    document.title + " " + href
-  );
+  let title = window.prompt("Bookmark to Scrapbox", document.title);
   if (title == null) return;
   let document_title_str = document.title.replace("[", "").replace("]", "");
   let link =
@@ -38,7 +35,9 @@ javascript: (function () {
       lines2.push(lines[i]);
     }
   }
-  var body = encodeURIComponent(lines.join("\n"));
+  lines2.unshift("", "[hr.icon]", "");
+  lines2.push("");
+  var body = encodeURIComponent(lines2.join("\n"));
 
   comment = "// Open the page //";
 

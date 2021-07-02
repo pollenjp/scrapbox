@@ -1,10 +1,30 @@
-// Unreal Engine TODO Twitter Clip
 javascript: (function () {
   let project_name = "pollenJP-MEMO";
   let comment = "comment variable";
+
+  comment = "// Date Class //";
+
+  Date.prototype.format = function (format) {
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    return format
+      .replace("ddd", days[this.getDay()])
+      .replace("yyyy", this.getFullYear())
+      .replace("MM", ("0" + (this.getMonth() + 1)).slice(-2))
+      .replace("dd", ("0" + this.getDate()).slice(-2))
+      .replace("hh", ("0" + this.getHours()).slice(-2))
+      .replace("mm", ("0" + this.getMinutes()).slice(-2))
+      .replace("ss", ("0" + this.getSeconds()).slice(-2));
+  };
+
+  const date = new Date();
+  let date_str = date.format("yyyy-MM-dd");
+
+  comment = "// top N lines //";
+
   let lines = [
+    "#date" + date_str,
     "[UnrealEngine TODO]",
-    "#UnrealEngine [UnrealEngine.icon]",
+    "[Unreal Engine] [Unreal Engine.icon]",
     "#TODO [TODO.icon]",
     "",
     "[hr.icon]",
@@ -61,6 +81,10 @@ javascript: (function () {
 
   lines = remove_empty_lines(lines);
 
+  comment = "// 末尾に空白行追加 //";
+
+  lines.push("");
+
   comment = "// add images //";
 
   let img_href_array;
@@ -87,6 +111,7 @@ javascript: (function () {
   }
   img_href_array.forEach(function (img_href) {
     lines.push("[" + img_href + "]");
+    lines.push("");
   });
 
   comment = "// Open the page //";

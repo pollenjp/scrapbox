@@ -1,4 +1,3 @@
-// Scrap Gallery
 javascript: (function () {
   const project_name = "pollenJP-MEMO";
   let comment = "comment variable";
@@ -33,11 +32,6 @@ javascript: (function () {
   comment = "// Get the Web Page Information //";
 
   let href = window.location.href;
-  let title = window.prompt(
-    "Bookmark to Scrapbox",
-    "[" + document.title + " " + href + "]"
-  );
-  if (title == null) return;
   let lines = [];
   let document_title_str = document.title.replace("[", "").replace("]", "");
   let link =
