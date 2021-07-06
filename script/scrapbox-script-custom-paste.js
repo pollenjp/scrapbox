@@ -1,4 +1,9 @@
-const DEBUG_MODE = true;
+// When running on local
+// - comment out import lines.
+// - set DEBUG_MODE as true.
+import "../scrapbox-script-popup-shortcut/script.js";
+const DEBUG_MODE = false;
+
 class SpaceRemover {
   constructor(
     options /* : dict */ = {
@@ -39,9 +44,10 @@ class SpaceRemover {
 
 if (!DEBUG_MODE) {
   // scrapbox
+  let title_name = "custom-paste";
   var space_remover = new SpaceRemover();
   scrapbox.PageMenu.addMenu({
-    title: "custom-paste",
+    title: title_name,
     image: "https://i.gyazo.com/88d6eee6b65a29a2047a9f1810928ca9.png", // paste logo
     onClick: async () => {
       const text = prompt("text を paste してください");
@@ -61,6 +67,20 @@ if (!DEBUG_MODE) {
       insertText(space_remover.convert(text));
     },
   });
+
+  scrapbox.PopupMenu.addButton({
+    title: title_name,
+    onClick: function (text) {
+      const pasted_text = prompt("text を paste してください");
+      if (pasted_text === null) return;
+      return space_remover.convert(pasted_text);
+    },
+  });
+
+  scrapboxPopupShortcut(
+    title_name,
+    (e) => e.charCode == 0x76 /* 0x76 is "v" */
+  );
 } else {
   // sample debug
   var remover = new SpaceRemover();
