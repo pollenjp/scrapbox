@@ -42,32 +42,34 @@ class SpaceRemover {
   }
 }
 
+function insertText(text) {
+  const cursor = document.getElementById("text-input");
+  cursor.focus();
+  const start = cursor.selectionStart; // in this case maybe 0
+  cursor.setRangeText(text);
+  cursor.selectionStart = cursor.selectionEnd = start + text.length;
+  const uiEvent = document.createEvent("UIEvent");
+  uiEvent.initEvent("input", true, false);
+  cursor.dispatchEvent(uiEvent);
+}
+
 if (!DEBUG_MODE) {
   // scrapbox
   let title_name = "custom-paste";
   var space_remover = new SpaceRemover();
+
+  // PageMenu //
   scrapbox.PageMenu.addMenu({
     title: title_name,
     image: "https://i.gyazo.com/88d6eee6b65a29a2047a9f1810928ca9.png", // paste logo
     onClick: async () => {
       const text = prompt("text を paste してください");
       if (text === null) return;
-
-      function insertText(text) {
-        const cursor = document.getElementById("text-input");
-        cursor.focus();
-        const start = cursor.selectionStart; // in this case maybe 0
-        cursor.setRangeText(text);
-        cursor.selectionStart = cursor.selectionEnd = start + text.length;
-        const uiEvent = document.createEvent("UIEvent");
-        uiEvent.initEvent("input", true, false);
-        cursor.dispatchEvent(uiEvent);
-      }
-
       insertText(space_remover.convert(text));
     },
   });
 
+  // PopupMenu //
   scrapbox.PopupMenu.addButton({
     title: title_name,
     onClick: function (text) {
@@ -77,10 +79,26 @@ if (!DEBUG_MODE) {
     },
   });
 
-  scrapboxPopupShortcut(
-    title_name,
-    (e) => e.charCode == 0x76 /* 0x76 is "v" */
-  );
+  // Alt + key //
+  (() => {
+    const aliases = {
+      KeyK: "keep",
+      KeyP: "problem",
+      KeyT: "try",
+    };
+
+    const onKeyDown = function (e) {
+      const event_code = "KeyV";
+      if (e.altKey && e.code == event_code) {
+        e.preventDefault();
+        const text = prompt("text を paste してください");
+        if (text === null) return;
+        insertText(space_remover.convert(text));
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+  })();
 } else {
   // sample debug
   var remover = new SpaceRemover();
