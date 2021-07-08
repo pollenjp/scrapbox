@@ -94,6 +94,12 @@ if (!DEBUG_MODE) {
         var space_remover = new SpaceRemover();
         insertText(space_remover.convert(text));
       },
+      KeyF: function () {
+        const text = prompt("text を paste してください");
+        if (text === null) return;
+        var space_remover = new SpaceRemover({ remove_line_feed: false });
+        insertText(space_remover.convert(text));
+      },
       KeyA: function () {
         const text = prompt("text を paste してください");
         if (text === null) return;
