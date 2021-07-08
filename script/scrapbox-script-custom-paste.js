@@ -3,33 +3,35 @@
 // - set DEBUG_MODE as true.
 import "../scrapbox-script-popup-shortcut/script.js";
 const DEBUG_MODE = false;
+// const DEBUG_MODE = true;
 
 class SpaceRemover {
-  constructor(
-    options /* : dict */ = {
-      line_feed: true,
-      half_width_space: true,
-      full_width_space: true,
-    }
-  ) {
-    this.options = options;
-  }
-
-  remove_line_feed(text) {
-    return text.replace("\n", "");
+  constructor({ remove_line_feed = true, one_sentence_newline = true } = {}) {
+    this.remove_line_feed = remove_line_feed;
+    this.one_sentence_newline = one_sentence_newline;
   }
 
   convert(text) {
+    // CR+LF -> LF
     text = text.replace(/\r\n/g, "\n");
     // 英単語によく出てくる, 行終わりの単語の切れ目をつなげるようにする
     text = text.replace(/-\n/g, "");
-    text = text.replace(/\n/g, " "); // convert line feed to white-space
+    // remove line feed
+    if (this.remove_line_feed) {
+      text = text.replace(/\n/g, " ");
+    }
     text = text.replace(/　/g, " "); // 全角スペースを半角スペースに変換
-    text = text.replace(/ +/g, " "); // 連続する半角スペースを1つにする
+    // 連続する半角スペースを1つにする
+    // 肯定先読み
+    text = text.replace(/ (?=[ ])/g, "");
     text = text.replace(/[、，]/g, ",");
     // text = text.replace(/，/g, ",");
     text = text.replace(/。/g, ".");
-    text = text.replace(/．/g, ".");
+    text = text.replace(/．/g, "."); // 全角 -> 半角
+
+    if (this.one_sentence_newline) {
+      text = text.replace(/\. */g, ".\n");
+    }
 
     // () の変換
     text = text.replace(/（/g, " (");
@@ -38,6 +40,9 @@ class SpaceRemover {
     // 日本語間のスペースを取り除く.
     // 肯定先読み
     text = text.replace(/([あ-んア-ン一-龥ー]) (?=[あ-んア-ン一-龥ー])/g, "$1");
+
+    // remove empty lines
+    text = text.replace(/\n(?=[\n])/g, "");
     return text;
   }
 }
@@ -56,7 +61,6 @@ function insertText(text) {
 if (!DEBUG_MODE) {
   // scrapbox
   let title_name = "custom-paste";
-  var space_remover = new SpaceRemover();
 
   // PageMenu //
   scrapbox.PageMenu.addMenu({
@@ -65,6 +69,7 @@ if (!DEBUG_MODE) {
     onClick: async () => {
       const text = prompt("text を paste してください");
       if (text === null) return;
+      var space_remover = new SpaceRemover();
       insertText(space_remover.convert(text));
     },
   });
@@ -75,6 +80,7 @@ if (!DEBUG_MODE) {
     onClick: function (text) {
       const pasted_text = prompt("text を paste してください");
       if (pasted_text === null) return;
+      var space_remover = new SpaceRemover();
       return space_remover.convert(pasted_text);
     },
   });
@@ -82,18 +88,24 @@ if (!DEBUG_MODE) {
   // Alt + key //
   (() => {
     const aliases = {
-      KeyK: "keep",
-      KeyP: "problem",
-      KeyT: "try",
+      KeyV: function () {
+        const text = prompt("text を paste してください");
+        if (text === null) return;
+        var space_remover = new SpaceRemover();
+        insertText(space_remover.convert(text));
+      },
+      KeyA: function () {
+        const text = prompt("text を paste してください");
+        if (text === null) return;
+        var space_remover = new SpaceRemover({ one_sentence_newline: false });
+        insertText(space_remover.convert(text));
+      },
     };
 
     const onKeyDown = function (e) {
-      const event_code = "KeyV";
-      if (e.altKey && e.code == event_code) {
+      if (e.altKey && e.code in aliases) {
         e.preventDefault();
-        const text = prompt("text を paste してください");
-        if (text === null) return;
-        insertText(space_remover.convert(text));
+        aliases[e.code]();
       }
     };
 
@@ -101,7 +113,6 @@ if (!DEBUG_MODE) {
   })();
 } else {
   // sample debug
-  var remover = new SpaceRemover();
   var text = `
 Net-
 work
@@ -113,7 +124,16 @@ world.
 私たちは，神．<-
 やばすぎる　やばすぎる<-
 日 本　語<-
+
+hello world. come on!
+
 ほとんどの開発現場では、ネットワーク管理者やサーバー管理者が、開発や運用のためのネットワークとサーバーを構築します。
 `;
+  var remover = new SpaceRemover();
+  console.log(remover.convert(text));
+  var remover = new SpaceRemover({
+    remove_line_feed: true,
+    one_sentence_newline: false,
+  });
   console.log(remover.convert(text));
 }
