@@ -89,13 +89,20 @@ if (!DEBUG_MODE) {
   (() => {
     const aliases = {
       KeyV: function () {
-        const text = prompt("text を paste してください");
+        const text = prompt(
+          "text を paste してください\n({remove_line_feed: true, one_sentense_new_line: true})"
+        );
         if (text === null) return;
-        var space_remover = new SpaceRemover();
+        var space_remover = new SpaceRemover({
+          remove_line_feed: true,
+          one_sentence_newline: true,
+        });
         insertText(space_remover.convert(text));
       },
       KeyG: function () {
-        const text = prompt("text を paste してください");
+        const text = prompt(
+          "text を paste してください\n({remove_line_feed: false, one_sentense_new_line: false})"
+        );
         if (text === null) return;
         var space_remover = new SpaceRemover({
           remove_line_feed: false,
@@ -104,9 +111,14 @@ if (!DEBUG_MODE) {
         insertText(space_remover.convert(text));
       },
       KeyF: function () {
-        const text = prompt("text を paste してください");
+        const text = prompt(
+          "text を paste してください\n({remove_line_feed: false, one_sentense_new_line: true})"
+        );
         if (text === null) return;
-        var space_remover = new SpaceRemover({ remove_line_feed: false });
+        var space_remover = new SpaceRemover({
+          remove_line_feed: false,
+          one_sentence_newline: true,
+        });
         insertText(space_remover.convert(text));
       },
       KeyA: function () {
