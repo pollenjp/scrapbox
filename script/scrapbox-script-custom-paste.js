@@ -25,12 +25,12 @@ class SpaceRemover {
     // 肯定先読み
     text = text.replace(/ (?=[ ])/g, "");
     text = text.replace(/[、，]/g, ",");
-    // text = text.replace(/，/g, ",");
-    text = text.replace(/。/g, ".");
-    text = text.replace(/．/g, "."); // 全角 -> 半角
+
+    text = text.replace(/。/g, ". ");
+    text = text.replace(/．/g, ". "); // 全角 -> 半角
 
     if (this.one_sentence_newline) {
-      text = text.replace(/\. */g, ".\n");
+      text = text.replace(/\. +/g, ".\n");
     }
 
     // () の変換
@@ -151,16 +151,16 @@ world.
 私たちは，神．<-
 やばすぎる　やばすぎる<-
 日 本　語<-
+fig1.1
+hoge。ほげ。
 
 hello world. come on!
 
 ほとんどの開発現場では、ネットワーク管理者やサーバー管理者が、開発や運用のためのネットワークとサーバーを構築します。
 `;
-  var remover = new SpaceRemover();
-  console.log(remover.convert(text));
   var remover = new SpaceRemover({
     remove_line_feed: true,
-    one_sentence_newline: false,
+    one_sentence_newline: true,
   });
   console.log(remover.convert(text));
 }
