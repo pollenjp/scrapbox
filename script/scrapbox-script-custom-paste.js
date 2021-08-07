@@ -1,7 +1,5 @@
 // When running on local
-// - comment out import lines.
 // - set DEBUG_MODE as true.
-import "../scrapbox-script-popup-shortcut/script.js";
 const DEBUG_MODE = false;
 // const DEBUG_MODE = true;
 
@@ -31,6 +29,7 @@ class SpaceRemover {
 
     text = text.replace(/：/g, ":"); // 全角 -> 半角
     text = text.replace(/；/g, ";"); // 全角 -> 半角
+    text = text.replace(/／/g, "/"); // 全角 -> 半角
 
     if (this.one_sentence_newline) {
       text = text.replace(/\. +/g, ".\n");
@@ -62,32 +61,6 @@ function insertText(text) {
 }
 
 if (!DEBUG_MODE) {
-  // scrapbox
-  let title_name = "custom-paste";
-
-  // PageMenu //
-  scrapbox.PageMenu.addMenu({
-    title: title_name,
-    image: "https://i.gyazo.com/88d6eee6b65a29a2047a9f1810928ca9.png", // paste logo
-    onClick: async () => {
-      const text = prompt("text を paste してください");
-      if (text === null) return;
-      var space_remover = new SpaceRemover();
-      insertText(space_remover.convert(text));
-    },
-  });
-
-  // PopupMenu //
-  scrapbox.PopupMenu.addButton({
-    title: title_name,
-    onClick: function (text) {
-      const pasted_text = prompt("text を paste してください");
-      if (pasted_text === null) return;
-      var space_remover = new SpaceRemover();
-      return space_remover.convert(pasted_text);
-    },
-  });
-
   // Alt + key //
   (() => {
     const aliases = {
