@@ -12,7 +12,7 @@ function insertText(text) {
 // Alt + key //
 (() => {
   const aliases = {
-    KeyR: function () {
+    KeyS: function () {
       insertText("[parent.icon]");
     },
   };
