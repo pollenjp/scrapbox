@@ -43,8 +43,8 @@ class SpaceRemover {
     // 肯定先読み
     text = text.replace(/([あ-んア-ン一-龥ー]) (?=[あ-んア-ン一-龥ー])/g, "$1");
 
-    // remove empty lines
-    text = text.replace(/\n(?=[\n])/g, "");
+    text = text.replace(/(\n) (?=[\n])/g, "$1"); // remove blank lines
+    text = text.replace(/\n(?=[\n])/g, ""); // remove empty lines
     return text;
   }
 }
@@ -117,6 +117,10 @@ if (!DEBUG_MODE) {
 } else {
   // sample debug
   var text = `
+a.
+
+   
+
 Net-
 work
 hello
@@ -135,8 +139,8 @@ hello world. come on!
 ほとんどの開発現場では、ネットワーク管理者やサーバー管理者が、開発や運用のためのネットワークとサーバーを構築します。
 `;
   var remover = new SpaceRemover({
-    remove_line_feed: true,
-    one_sentence_newline: true,
+    remove_line_feed: false,
+    one_sentence_newline: false,
   });
   console.log(remover.convert(text));
 }
