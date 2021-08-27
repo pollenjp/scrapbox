@@ -15,6 +15,9 @@ function insertText(text) {
     KeyS: function () {
       insertText("[parent.icon]");
     },
+    KeyW: function () {
+      insertText("[/icons/hr.icon]");
+    },
   };
 
   const onKeyDown = function (e) {
