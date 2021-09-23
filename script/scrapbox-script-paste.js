@@ -37,6 +37,10 @@ class CustomUrlData {
 }
 
 const urlToIconName = {
+  atcoder: new CustomUrlData({
+    hostname: "atcoder.jp",
+    icon_str: "[AtCoder.icon]",
+  }),
   amazon_co_jp: new CustomUrlData({
     hostname: "www.amazon.co.jp",
     icon_str: "[Amazon.icon]",
@@ -63,6 +67,10 @@ const urlToIconName = {
   google_photo: new CustomUrlData({
     hostname: "photos.google.com",
     icon_str: "[Google Photo.icon]",
+  }),
+  qiita: new CustomUrlData({
+    hostname: "Qiita.com",
+    icon_str: "[Qiita.icon]",
   }),
   twitter: new CustomUrlData({
     hostname: "twitter.com",
