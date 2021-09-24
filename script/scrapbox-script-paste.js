@@ -69,7 +69,7 @@ const urlToIconName = {
     icon_str: "[Google Photo.icon]",
   }),
   qiita: new CustomUrlData({
-    hostname: "Qiita.com",
+    hostname: "qiita.com",
     icon_str: "[Qiita.icon]",
   }),
   twitter: new CustomUrlData({
