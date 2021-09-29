@@ -28,11 +28,18 @@ function insertScrapboxUrl(url, event) {
 }
 
 class CustomUrlData {
-  constructor({ hostname, icon_str, custom_link_name = null, memo = null }) {
+  constructor({
+    hostname,
+    icon_str,
+    custom_link_name = null,
+    memo = null,
+    path_list = null,
+  }) {
     this.hostname = hostname;
     this.icon_str = icon_str;
     this.custom_link_name = custom_link_name;
     this.memo = memo;
+    this.path_list = path_list;
   }
 }
 
@@ -68,6 +75,16 @@ const urlToIconName = {
     hostname: "photos.google.com",
     icon_str: "[Google Photo.icon]",
   }),
+  google_docs: new CustomUrlData({
+    hostname: "docs.google.com",
+    icon_str: "[Google Docs.icon]",
+    path_list: ["document"],
+  }),
+  google_slide: new CustomUrlData({
+    hostname: "docs.google.com",
+    icon_str: "[Google Slide.icon]",
+    path_list: ["presentation"],
+  }),
   niconico: new CustomUrlData({
     hostname: "www.nicovideo.jp",
     icon_str: "[NicoNico.icon]",
@@ -92,11 +109,6 @@ const urlToIconName = {
     hostname: "www.youtube.com",
     icon_str: "[YouTube.icon]",
   }),
-  google_slide: new CustomUrlData({
-    hostname: "docs.google.com",
-    icon_str: "[Google Slide.icon]",
-    path_list: ["presentation"],
-  }),
   // tmp
   MoodleSophia: new CustomUrlData({
     hostname: "moodle.cc.sophia.ac.jp",
@@ -109,11 +121,15 @@ function insertUrl(url, event) {
   for (var key in urlToIconName) {
     console.log(`url.hostname = ${url.hostname}`);
     console.log(`urlToIconName[key].hostname = ${urlToIconName[key].hostname}`);
-    if (url.hostname == urlToIconName[key].hostname) {
-      if (urlToIconName[key].path_list) {
+    if (url.hostname === urlToIconName[key].hostname) {
+      console.log(
+        `urlToIconName[key].path_list = ${urlToIconName[key].path_list}`
+      );
+      if (urlToIconName[key].path_list !== null) {
         let path_matched = true;
-        let path_list = urlToIconName[key].pathname.split("/");
+        let path_list = url.pathname.split("/");
         urlToIconName[key].path_list.forEach((elem, index) => {
+          // Warning: path_list's first element is empty string, because pathname is started with '/' (root).
           console.log(elem, index);
           if (elem != path_list[index + 1]) {
             path_matched = false;
