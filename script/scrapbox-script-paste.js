@@ -68,6 +68,14 @@ const urlToIconName = {
     hostname: "photos.google.com",
     icon_str: "[Google Photo.icon]",
   }),
+  niconico: new CustomUrlData({
+    hostname: "www.nicovideo.jp",
+    icon_str: "[NicoNico.icon]",
+  }),
+  paperswithcode: new CustomUrlData({
+    hostname: "paperswithcode.com",
+    icon_str: "[@paperswithcode Papers with Code.icon]",
+  }),
   qiita: new CustomUrlData({
     hostname: "qiita.com",
     icon_str: "[Qiita.icon]",
@@ -88,6 +96,11 @@ const urlToIconName = {
     hostname: "docs.google.com",
     icon_str: "[Google Slide.icon]",
     path_list: ["presentation"],
+  }),
+  // tmp
+  MoodleSophia: new CustomUrlData({
+    hostname: "moodle.cc.sophia.ac.jp",
+    icon_str: "[Moodle.icon]",
   }),
 };
 function insertUrl(url, event) {
