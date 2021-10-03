@@ -71,6 +71,10 @@ const urlToIconName = {
     hostname: "gist.github.com",
     icon_str: "[GitHub Gist.icon]",
   }),
+  gitlab: new CustomUrlData({
+    hostname: "gitlab.com",
+    icon_str: "[GitLab.icon]",
+  }),
   google_photo: new CustomUrlData({
     hostname: "photos.google.com",
     icon_str: "[Google Photo.icon]",
