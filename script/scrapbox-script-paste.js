@@ -89,6 +89,10 @@ const urlToIconName = {
     icon_str: "[Google Slide.icon]",
     path_list: ["presentation"],
   }),
+  hackmd: new CustomUrlData({
+    hostname: "hackmd.IO",
+    icon_str: "[HackMD.icon]",
+  }),
   niconico: new CustomUrlData({
     hostname: "www.nicovideo.jp",
     icon_str: "[NicoNico.icon]",
