@@ -18,13 +18,13 @@ function insertScrapboxUrl(url, event) {
     return;
   }
 
-  let text;
-  let page_title = url_elements[1];
-  if (page_title.substring(0, 1) == "@") {
-    text = `[${page_title}.icon] [${page_title}]`;
-    event.preventDefault();
-    insertText(text);
-  }
+  // let text;
+  // let page_title = url_elements[1];
+  // if (page_title.substring(0, 1) == "@") {
+  //   text = `[${page_title}.icon] [${page_title}]`;
+  //   event.preventDefault();
+  //   insertText(text);
+  // }
 }
 
 class CustomUrlData {
