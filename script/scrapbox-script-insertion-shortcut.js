@@ -1,3 +1,5 @@
+import { CustomDate } from "/api/code/pollenJP-MEMO/scrapbox-script-date/script.js";
+
 function insertText(text) {
   const cursor = document.getElementById("text-input");
   cursor.focus();
@@ -14,6 +16,11 @@ function insertText(text) {
   const aliases = {
     KeyS: function () {
       insertText("[parent.icon]");
+    },
+    KeyR: function () {
+      const d = new CustomDate();
+      const dateFormat = "yyyy-MM-dd";
+      insertText(`${d.format(dateFormat)}`);
     },
     KeyW: function () {
       insertText("[/icons/hr.icon]");
