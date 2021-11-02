@@ -48,9 +48,21 @@ const urlToIconName = {
     hostname: "atcoder.jp",
     icon_str: "[AtCoder.icon]",
   }),
+  connpass_web_link: new CustomUrlData({
+    hostname: "connpass.com",
+    icon_str: "[connpass.icon]",
+  }),
   amazon_co_jp: new CustomUrlData({
     hostname: "www.amazon.co.jp",
     icon_str: "[Amazon.icon]",
+  }),
+  github: new CustomUrlData({
+    hostname: "github.com",
+    icon_str: "[GitHub.icon]",
+  }),
+  github_gist: new CustomUrlData({
+    hostname: "gist.github.com",
+    icon_str: "[GitHub Gist.icon]",
   }),
   discord_web_link: new CustomUrlData({
     hostname: "discord.com",
@@ -62,14 +74,6 @@ const urlToIconName = {
     icon_str: "[Evernote.icon]",
     custom_link_name: `evernote-link`,
     memo: `#date${new CustomDatetime().format("yyyy-MM-dd")} `,
-  }),
-  github: new CustomUrlData({
-    hostname: "github.com",
-    icon_str: "[GitHub.icon]",
-  }),
-  github_gist: new CustomUrlData({
-    hostname: "gist.github.com",
-    icon_str: "[GitHub Gist.icon]",
   }),
   gitlab: new CustomUrlData({
     hostname: "gitlab.com",
@@ -83,6 +87,11 @@ const urlToIconName = {
     hostname: "docs.google.com",
     icon_str: "[Google Docs.icon]",
     path_list: ["document"],
+  }),
+  google_sheets: new CustomUrlData({
+    hostname: "docs.google.com",
+    icon_str: "[Google Sheets (spreadsheet).icon]",
+    path_list: ["spreadsheets"],
   }),
   google_slide: new CustomUrlData({
     hostname: "docs.google.com",
