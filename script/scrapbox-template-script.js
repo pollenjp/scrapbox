@@ -28,8 +28,8 @@ export function addTemplateItemsToPageMenu(project_name) {
       template: `/api/code/${project_name}/DiscordBotPortalJPLogTemplate/script.js`,
     },
     {
-      title: "InfraDiscord Q&A",
-      template: `/api/code/${project_name}/InfraDiscordQandATemplate/script.js`,
+      title: "Q&A Log",
+      template: `/api/code/${project_name}/QandALogTemplate/script.js`,
     },
     {
       title: "Person",
