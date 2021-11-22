@@ -14,6 +14,9 @@ function insertText(text) {
 // Alt + key //
 (() => {
   const aliases = {
+    KeyC: function () {
+      insertText("code:");
+    },
     KeyS: function () {
       insertText("[parent.icon]");
     },
