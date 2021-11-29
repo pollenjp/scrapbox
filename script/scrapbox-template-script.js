@@ -29,7 +29,7 @@ export function addTemplateItemsToPageMenu(project_name) {
     },
     {
       title: "Q&A Log",
-      template: `/api/code/${project_name}/QandALogTemplate/script.js`,
+      template: `/api/code/${project_name}/scrapbox-template_q-and-a-log/script.js`,
     },
     {
       title: "Person",
@@ -38,6 +38,10 @@ export function addTemplateItemsToPageMenu(project_name) {
     {
       title: "Book",
       template: `/api/code/${project_name}/scrapbox-template_scrap-book/script.js`,
+    },
+    {
+      title: "論文",
+      template: `/api/code/${project_name}/scrapbox-template_scrap-thesis/script.js`,
     },
   ];
   // テンプレートメニューの定義ここまで ----------
