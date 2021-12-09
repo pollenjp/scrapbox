@@ -134,7 +134,7 @@ const urlToIconName = {
 };
 function insertUrl(url, event) {
   console.log("insertUrl was called!");
-  let text = `[${url.toString()}]`;
+  let text = `[${decodeURI(url.toString())}]`;
   for (var key in urlToIconName) {
     console.log(`url.hostname = ${url.hostname}`);
     console.log(`urlToIconName[key].hostname = ${urlToIconName[key].hostname}`);
