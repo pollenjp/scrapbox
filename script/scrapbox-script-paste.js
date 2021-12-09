@@ -83,6 +83,10 @@ const urlToIconName = {
     hostname: "photos.google.com",
     icon_str: "[Google Photo.icon]",
   }),
+  google_drive: new CustomUrlData({
+    hostname: "drive.google.com",
+    icon_str: "[Google Drive.icon]",
+  }),
   google_docs: new CustomUrlData({
     hostname: "docs.google.com",
     icon_str: "[Google Docs.icon]",
