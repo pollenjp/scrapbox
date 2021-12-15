@@ -30,9 +30,13 @@ class SpaceRemover {
     text = text.replace(/：/g, ":"); // 全角 -> 半角
     text = text.replace(/；/g, ";"); // 全角 -> 半角
     text = text.replace(/／/g, "/"); // 全角 -> 半角
+    text = text.replace(/？/g, "?"); // 全角 -> 半角
+    text = text.replace(/！/g, "!"); // 全角 -> 半角
 
     if (this.one_sentence_newline) {
       text = text.replace(/\. +/g, ".\n");
+      text = text.replace(/\? +/g, "?\n");
+      text = text.replace(/\! +/g, "!\n");
     }
 
     // () の変換
