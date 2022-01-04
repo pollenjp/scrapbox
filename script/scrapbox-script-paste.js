@@ -123,12 +123,16 @@ const urlToIconName = {
     icon_str: "[Twitter.icon]",
   }),
   twitter_mobile: new CustomUrlData({
-    hostname: "twitter.com",
+    hostname: "mobile.twitter.com",
     icon_str: "[Twitter.icon]",
   }),
-  twitter_mobile: new CustomUrlData({
+  youtube: new CustomUrlData({
     hostname: "www.youtube.com",
     icon_str: "[YouTube.icon]",
+  }),
+  zenn: new CustomUrlData({
+    hostname: "zenn.dev",
+    icon_str: "[Zenn.icon]",
   }),
   // tmp
   MoodleSophia: new CustomUrlData({
