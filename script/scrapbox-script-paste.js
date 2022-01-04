@@ -140,7 +140,7 @@ const urlToIconName = {
     icon_str: "[Moodle.icon]",
   }),
 };
-function insertUrl(url, event) {
+function insertUrl(url) {
   console.log("insertUrl was called!");
   let text = `[${decodeURI(url.toString())}]`;
   for (var key in urlToIconName) {
@@ -185,7 +185,6 @@ function insertUrl(url, event) {
     }
   }
 
-  event.preventDefault();
   insertText(text);
   return;
 }
@@ -211,7 +210,13 @@ document.addEventListener("paste", (event) => {
       if (url.hostname == SCRAPBOX_URL_HOSTNAME) {
         insertScrapboxUrl(url, event);
       } else {
-        insertUrl(url, event);
+        insertUrl(url);
+
+        if (url.hostname == urlToIconName["twitter"].hostname) {
+          insertText("\n");
+        } else {
+          event.preventDefault();
+        }
       }
     }
   }
