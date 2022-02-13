@@ -126,10 +126,12 @@ javascript: (function () {
     default:
       img_href_array = [];
   }
+
+  images_str_block = "";
   img_href_array.forEach(function (img_href) {
-    lines_body.push("[" + img_href + "]");
-    lines_body.push("");
+    images_str_block += "[" + img_href + "]";
   });
+  lines_body.push(images_str_block);
 
   comment = "// Open the page //";
 
