@@ -102,10 +102,15 @@ if (!DEBUG_MODE) {
         insertText(space_remover.convert(text));
       },
       KeyA: function () {
-        const text = prompt("text を paste してください");
+        const text = prompt("text を paste してください (すべて一行で展開)");
         if (text === null) return;
         var space_remover = new SpaceRemover({ one_sentence_newline: false });
         insertText(space_remover.convert(text));
+      },
+      KeyB: function () {
+        const text = prompt("url を paste してください (encodeURI)");
+        if (text === null) return;
+        insertText(encodeURI(text));
       },
     };
 
