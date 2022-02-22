@@ -127,7 +127,7 @@ javascript: (function () {
       img_href_array = [];
   }
 
-  images_str_block = "";
+  let images_str_block = "";
   img_href_array.forEach(function (img_href) {
     images_str_block += "[" + img_href + "]";
   });
