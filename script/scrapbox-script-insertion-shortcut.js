@@ -17,13 +17,19 @@ function insertText(text) {
     KeyC: function () {
       insertText("code:");
     },
-    KeyS: function () {
-      insertText("[parent.icon]");
+    KeyE: function () {
+      insertText("[/icons/hr.icon]");
+    },
+    KeyI: function () {
+      insertText("[pollenJP.icon] ( [pollenJP] ) ");
     },
     KeyR: function () {
       const d = new CustomDate();
       const dateFormat = "yyyy-MM-dd";
       insertText(`${d.format(dateFormat)}`);
+    },
+    KeyS: function () {
+      insertText("[parent.icon]");
     },
     KeyW: function () {
       insertText("[/icons/hr.icon]");
