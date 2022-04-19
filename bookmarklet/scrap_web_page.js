@@ -1,7 +1,7 @@
 javascript: (function () {
   let project_name = "pollenJP-MEMO";
   let comment = "comment variable";
-  let lines = [];
+  let lines = [""];
 
   comment = "// Get the Web Page Information //";
 
@@ -36,7 +36,6 @@ javascript: (function () {
       lines2.push(lines[i]);
     }
   }
-  lines2.unshift("", "[hr.icon]", "");
   lines2.push("");
   var body = encodeURIComponent(lines2.join("\n"));
 
