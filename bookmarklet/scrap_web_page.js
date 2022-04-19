@@ -8,11 +8,12 @@ javascript: (function () {
   let href = window.location.href;
   let title = window.prompt("Bookmark to Scrapbox", document.title);
   if (title == null) return;
-  let document_title_str = document.title.replace("[", "").replace("]", "");
-  let link =
-    "[Web Page.icon] [Web Page: " + document_title_str + " " + href + "]";
+
   comment = "// add link //";
-  lines.push(" " + link);
+
+  let document_title_str = document.title.replace("[", "").replace("]", "");
+  lines.push(document_title_str);
+  lines.push("[" + href + "]");
 
   comment = "// 引用文追加 //";
 
@@ -45,7 +46,7 @@ javascript: (function () {
     "https://scrapbox.io/" +
       encodeURIComponent(project_name) +
       "/" +
-      encodeURIComponent(title.trim()) +
+      encodeURIComponent(document_title_str.trim()) +
       "?body=" +
       body
   );
