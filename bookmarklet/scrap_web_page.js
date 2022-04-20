@@ -8,6 +8,7 @@ javascript: (function () {
   let href = window.location.href;
   let title = window.prompt("Bookmark to Scrapbox", document.title);
   if (title == null) return;
+  title = title.replace("[", "").replace("]", "");
 
   comment = "// add link //";
 
@@ -45,7 +46,7 @@ javascript: (function () {
     "https://scrapbox.io/" +
       encodeURIComponent(project_name) +
       "/" +
-      encodeURIComponent(document_title_str.trim()) +
+      encodeURIComponent(title.trim()) +
       "?body=" +
       body
   );
