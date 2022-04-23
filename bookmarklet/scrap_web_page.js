@@ -8,11 +8,13 @@ javascript: (function () {
   let href = window.location.href;
   let title = window.prompt("Bookmark to Scrapbox", document.title);
   if (title == null) return;
-  title = title.replace("[", "").replace("]", "");
+  title = title.replaceAll("[", "").replaceAll("]", "");
 
   comment = "// add link //";
 
-  let document_title_str = document.title.replace("[", "").replace("]", "");
+  let document_title_str = document.title
+    .replaceAll("[", "")
+    .replaceAll("]", "");
   lines.push(document_title_str);
   lines.push("[" + href + "]");
 
