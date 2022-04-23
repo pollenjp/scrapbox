@@ -46,11 +46,20 @@ class CustomUrlData {
 const urlToIconName = {
   atcoder: new CustomUrlData({
     hostname: "atcoder.jp",
-    icon_str: "[AtCoder.icon]",
+    icon_str: "[(icon) AtCoder.icon]",
   }),
   connpass_web_link: new CustomUrlData({
     hostname: "connpass.com",
     icon_str: "[connpass.icon]",
+  }),
+  discord_web_link: new CustomUrlData({
+    hostname: "discord.com",
+    icon_str: "[Discord.icon]",
+    memo: `#date${new CustomDatetime().format("yyyy-MM-dd")} `,
+  }),
+  connpass_web_link: new CustomUrlData({
+    hostname: "hackmd.io",
+    icon_str: "[(icon) HackMD.icon]",
   }),
   amazon_co_jp: new CustomUrlData({
     hostname: "www.amazon.co.jp",
@@ -64,16 +73,13 @@ const urlToIconName = {
     hostname: "gist.github.com",
     icon_str: "[GitHub Gist.icon]",
   }),
-  discord_web_link: new CustomUrlData({
-    hostname: "discord.com",
-    icon_str: "[Discord.icon]",
-    memo: `#date${new CustomDatetime().format("yyyy-MM-dd")} `,
-  }),
   evernote_web_link: new CustomUrlData({
     hostname: "www.evernote.com",
     icon_str: "[Evernote.icon]",
     custom_link_name: `evernote-link`,
-    memo: `#date${new CustomDatetime().format("yyyy-MM-dd")} `,
+    memo: `[Evernote Scan Data] [Scan Data] #date${new CustomDatetime().format(
+      "yyyy-MM-dd"
+    )} `,
   }),
   gitlab: new CustomUrlData({
     hostname: "gitlab.com",
@@ -106,6 +112,18 @@ const urlToIconName = {
     hostname: "hackmd.IO",
     icon_str: "[HackMD.icon]",
   }),
+  jp_gr_kmc: new CustomUrlData({
+    hostname: "kmc.gr.jp",
+    icon_str: "[(icon) KMC.icon]",
+  }),
+  jp_gr_kmc_inside: new CustomUrlData({
+    hostname: "inside.kmc.gr.jp",
+    icon_str: "[(icon) KMC.icon]",
+  }),
+  pypi: new CustomUrlData({
+    hostname: "pypi.org",
+    icon_str: "[PyPI.icon]",
+  }),
   niconico: new CustomUrlData({
     hostname: "www.nicovideo.jp",
     icon_str: "[NicoNico.icon]",
@@ -113,6 +131,10 @@ const urlToIconName = {
   paperswithcode: new CustomUrlData({
     hostname: "paperswithcode.com",
     icon_str: "[@paperswithcode Papers with Code.icon]",
+  }),
+  pixiv: new CustomUrlData({
+    hostname: "www.pixiv.net",
+    icon_str: "[(icon) pixiv.icon]",
   }),
   qiita: new CustomUrlData({
     hostname: "qiita.com",
