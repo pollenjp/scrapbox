@@ -210,6 +210,24 @@ function insertUrl(url) {
   insertText(text);
   return;
 }
+
+const isValidEvernoteAppLink = (text) => {
+  var urlRegex = /(evernote:\/\/\/[^\s]+)/;
+  var ret_val = text.match(urlRegex); // true or null
+  if (ret_val) {
+    return true;
+  }
+  return false;
+};
+
+function convertEvernoteLinkApp2Web(app_link) {
+  let rx =
+    /evernote:\/\/\/view\/(?<ID1>[0-9]+)\/(?<ID2>[a-zA-Z0-9-]+)\/(?<ID3>[a-zA-Z0-9-]+)\/(?<ID4>[a-zA-Z0-9-]+)(?<query>[\s]*)/;
+  let match_groups = app_link.match(rx).groups;
+  console.log(match_groups);
+  return `https://www.evernote.com/shard/${match_groups.ID2}/nl/${match_groups.ID1}/${match_groups.ID3}`;
+}
+
 document.addEventListener("paste", (event) => {
   const d = event.clipboardData;
   console.log(d.types);
@@ -226,6 +244,11 @@ document.addEventListener("paste", (event) => {
 
   if (lines.length == 1) {
     var line = lines[0];
+
+    if (isValidEvernoteAppLink(line)) {
+      line = convertEvernoteLinkApp2Web(line);
+    }
+
     if (isValidUrl(line)) {
       let url = new URL(line);
       console.log(url.toString());
