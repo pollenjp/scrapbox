@@ -68,17 +68,28 @@ if (!DEBUG_MODE) {
   // Alt + key //
   (() => {
     const aliases = {
-      KeyV: function () {
-        const text = prompt(
-          "text を paste してください\n({remove_line_feed: true, one_sentense_new_line: true})"
-        );
+      KeyA: function () {
+        const text = prompt("text を paste してください (すべて一行で展開)");
         if (text === null) return;
-        var space_remover = new SpaceRemover({
-          remove_line_feed: true,
-          one_sentence_newline: true,
-        });
+        var space_remover = new SpaceRemover({ one_sentence_newline: false });
         insertText(space_remover.convert(text));
       },
+      KeyB: function () {
+        const text = prompt("url を paste してください (encodeURI)");
+        if (text === null) return;
+        insertText(encodeURI(text));
+      },
+      // KeyF: function () {
+      //   const text = prompt(
+      //     "text を paste してください\n({remove_line_feed: false, one_sentense_new_line: true})"
+      //   );
+      //   if (text === null) return;
+      //   var space_remover = new SpaceRemover({
+      //     remove_line_feed: false,
+      //     one_sentence_newline: true,
+      //   });
+      //   insertText(space_remover.convert(text));
+      // },
       KeyG: function () {
         const text = prompt(
           "text を paste してください\n({remove_line_feed: false, one_sentense_new_line: false})"
@@ -90,27 +101,16 @@ if (!DEBUG_MODE) {
         });
         insertText(space_remover.convert(text));
       },
-      KeyF: function () {
+      KeyV: function () {
         const text = prompt(
-          "text を paste してください\n({remove_line_feed: false, one_sentense_new_line: true})"
+          "text を paste してください\n({remove_line_feed: true, one_sentense_new_line: true})"
         );
         if (text === null) return;
         var space_remover = new SpaceRemover({
-          remove_line_feed: false,
+          remove_line_feed: true,
           one_sentence_newline: true,
         });
         insertText(space_remover.convert(text));
-      },
-      KeyA: function () {
-        const text = prompt("text を paste してください (すべて一行で展開)");
-        if (text === null) return;
-        var space_remover = new SpaceRemover({ one_sentence_newline: false });
-        insertText(space_remover.convert(text));
-      },
-      KeyB: function () {
-        const text = prompt("url を paste してください (encodeURI)");
-        if (text === null) return;
-        insertText(encodeURI(text));
       },
     };
 
