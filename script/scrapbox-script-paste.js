@@ -44,6 +44,10 @@ class CustomUrlData {
 }
 
 const urlToIconName = {
+  amazon_co_jp: new CustomUrlData({
+    hostname: "www.amazon.co.jp",
+    icon_str: "[Amazon.icon]",
+  }),
   atcoder: new CustomUrlData({
     hostname: "atcoder.jp",
     icon_str: "[(icon) AtCoder.icon]",
@@ -57,13 +61,13 @@ const urlToIconName = {
     icon_str: "[Discord.icon]",
     memo: `#date${new CustomDatetime().format("yyyy-MM-dd")} `,
   }),
-  connpass_web_link: new CustomUrlData({
-    hostname: "hackmd.io",
-    icon_str: "[(icon) HackMD.icon]",
-  }),
-  amazon_co_jp: new CustomUrlData({
-    hostname: "www.amazon.co.jp",
-    icon_str: "[Amazon.icon]",
+  evernote_web_link: new CustomUrlData({
+    hostname: "www.evernote.com",
+    icon_str: "[Evernote.icon]",
+    custom_link_name: `evernote-link`,
+    memo: `[Evernote Scan Data] [Scan Data] #date${new CustomDatetime().format(
+      "yyyy-MM-dd"
+    )} `,
   }),
   github: new CustomUrlData({
     hostname: "github.com",
@@ -72,14 +76,6 @@ const urlToIconName = {
   github_gist: new CustomUrlData({
     hostname: "gist.github.com",
     icon_str: "[GitHub Gist.icon]",
-  }),
-  evernote_web_link: new CustomUrlData({
-    hostname: "www.evernote.com",
-    icon_str: "[Evernote.icon]",
-    custom_link_name: `evernote-link`,
-    memo: `[Evernote Scan Data] [Scan Data] #date${new CustomDatetime().format(
-      "yyyy-MM-dd"
-    )} `,
   }),
   gitlab: new CustomUrlData({
     hostname: "gitlab.com",
@@ -110,7 +106,15 @@ const urlToIconName = {
   }),
   hackmd: new CustomUrlData({
     hostname: "hackmd.IO",
-    icon_str: "[HackMD.icon]",
+    icon_str: "[(icon) HackMD.icon]",
+  }),
+  niconico: new CustomUrlData({
+    hostname: "www.nicovideo.jp",
+    icon_str: "[NicoNico.icon]",
+  }),
+  notion: new CustomUrlData({
+    hostname: "www.notion.so",
+    icon_str: "[(icon) Notion.icon]",
   }),
   jp_gr_kmc: new CustomUrlData({
     hostname: "kmc.gr.jp",
@@ -119,14 +123,6 @@ const urlToIconName = {
   jp_gr_kmc_inside: new CustomUrlData({
     hostname: "inside.kmc.gr.jp",
     icon_str: "[(icon) KMC.icon]",
-  }),
-  pypi: new CustomUrlData({
-    hostname: "pypi.org",
-    icon_str: "[PyPI.icon]",
-  }),
-  niconico: new CustomUrlData({
-    hostname: "www.nicovideo.jp",
-    icon_str: "[NicoNico.icon]",
   }),
   paperswithcode: new CustomUrlData({
     hostname: "paperswithcode.com",
@@ -143,6 +139,10 @@ const urlToIconName = {
   twitter: new CustomUrlData({
     hostname: "twitter.com",
     icon_str: "[Twitter.icon]",
+  }),
+  pypi: new CustomUrlData({
+    hostname: "pypi.org",
+    icon_str: "[(icon) PyPI.icon]",
   }),
   twitter_mobile: new CustomUrlData({
     hostname: "mobile.twitter.com",
