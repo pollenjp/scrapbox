@@ -59,7 +59,25 @@ javascript: (function () {
     "[date" + date_str + "] ",
     "",
   ];
-  let lines_body = [];
+
+  comment = "// add profile_image //";
+
+  const twitter_profile_prefix = "https://pbs.twimg.com/profile_images/";
+
+  let meta_contents = [].slice.call(document.querySelectorAll("meta"));
+  let author_profile_image_url = "";
+  for (let i = 0; i < meta_contents.length; i++) {
+    let meta = meta_contents[i];
+    if (meta.content && meta.content.startsWith(twitter_profile_prefix)) {
+      let url = new URL(meta.content);
+      author_profile_image_url = url.toString();
+      break;
+    }
+  }
+  lines_header = lines_header.concat([
+    "[" + author_profile_image_url + "]",
+    "",
+  ]);
 
   comment = "// remove empty lines //";
 
@@ -82,6 +100,8 @@ javascript: (function () {
   };
 
   comment = "// Get the Web Page Information //";
+
+  let lines_body = [];
 
   let document_title_str = document.title.replace("[", "").replace("]", "");
   let link = "[" + href + "]";
