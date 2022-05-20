@@ -10,3 +10,12 @@ scrapbox.PopupMenu.addButton({
 });
 
 scrapboxPopupShortcut(tmp_name, (e) => e.charCode == 0x7b /* "{" */);
+
+var tmp_name = "wrap math";
+scrapbox.PopupMenu.addButton({
+  title: tmp_name,
+  onClick: function (text) {
+    text = " [$ " + text + " ] ";
+    return text;
+  },
+});
