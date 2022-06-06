@@ -45,8 +45,6 @@ javascript: (function () {
     "[Gallery] ",
     "[date" + date_str + "] ",
     "",
-    "[hr.icon]",
-    "",
   ];
   let lines_body = [];
 

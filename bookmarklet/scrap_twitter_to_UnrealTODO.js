@@ -27,8 +27,6 @@ javascript: (function () {
     "[Unreal Engine] [Unreal Engine.icon]",
     "#TODO [TODO.icon]",
     "",
-    "[hr.icon]",
-    "",
   ];
 
   comment = "// remove empty lines //";

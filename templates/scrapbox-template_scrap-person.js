@@ -21,8 +21,6 @@
 #person 
 #date${d.format(dateFormat)} 
 
-[hr.icon]
-
 
 `;
 })();
