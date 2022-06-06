@@ -22,7 +22,6 @@
 #Research
 #論文 [parent.icon]
 
-[/icons/hr.icon]
 TODO: [論文]にこのページへのリンクを載せる.
 
 code:text
@@ -43,8 +42,6 @@ code:cite.txt
  
 
 サムネイル
-
-[/icons/hr.icon]
 
 [** 内容まとめ]
 

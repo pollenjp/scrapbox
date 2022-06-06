@@ -59,7 +59,7 @@ javascript: (function () {
 
   const scrapbox_page_title =
     "Memo - " + date.format("yyyyMMddhhmmss") + generate_random_string(20);
-  let lines2 = ["#Gallery", "#date" + date_str, "", "[/icons/hr.icon]", ""];
+  let lines2 = ["#Gallery", "#date" + date_str, ""];
 
   comment = "// ``lines`` の空白行の削除 //";
 
