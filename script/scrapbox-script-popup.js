@@ -60,3 +60,12 @@ scrapbox.PopupMenu.addButton({
     return text;
   },
 });
+
+var tmp_name = "wrap linux path";
+scrapbox.PopupMenu.addButton({
+  title: tmp_name,
+  onClick: function (text) {
+    text = "[(linux) " + text + "]";
+    return text;
+  },
+});
