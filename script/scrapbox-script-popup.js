@@ -61,6 +61,34 @@ scrapbox.PopupMenu.addButton({
   },
 });
 
+var tmp_name = "convert math";
+scrapbox.PopupMenu.addButton({
+  title: tmp_name,
+  onClick: function (text) {
+    const target_text = text;
+    let ret_text = "";
+    let re = /\$(?<latex_math>.*?)(^\$)*\$/g;
+    let prev_idx = 0;
+    var match;
+    while ((match = re.exec(target_text)) != null) {
+      const match_text = match[0];
+      const match_groups_latex_math = match.groups.latex_math;
+      const match_idx = re.lastIndex - match_text.length;
+      ret_text += target_text.slice(prev_idx, match_idx);
+      prev_idx = re.lastIndex;
+
+      ret_text += ` [$ ${match_groups_latex_math} ] `;
+      console.log(`${ret_text}`);
+    }
+
+    if (prev_idx > 0) {
+      ret_text += target_text.slice(prev_idx);
+    }
+
+    return ret_text;
+  },
+});
+
 var tmp_name = "wrap linux path";
 scrapbox.PopupMenu.addButton({
   title: tmp_name,
