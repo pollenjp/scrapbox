@@ -1,12 +1,16 @@
 javascript: (function () {
   let project_name = "pollenJP-MEMO";
   let comment = "comment variable";
-  let lines = [""];
+  let lines = ["[" + window.location.hostname + "]", ""];
 
   comment = "// Get the Web Page Information //";
 
   let href = window.location.href;
-  let title = window.prompt("Bookmark to Scrapbox", document.title);
+  let title =
+    window.prompt("Bookmark to Scrapbox", document.title) +
+    " (" +
+    window.location.hostname +
+    ")";
   if (title == null) return;
   title = title.replaceAll("[", "").replaceAll("]", "");
 
