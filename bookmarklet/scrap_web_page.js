@@ -6,13 +6,15 @@ javascript: (function () {
   comment = "// Get the Web Page Information //";
 
   let href = window.location.href;
-  let title =
-    window.prompt("Bookmark to Scrapbox", document.title) +
-    " (" +
-    window.location.hostname +
-    ")";
+  let title = window.prompt("Bookmark to Scrapbox", document.title);
   if (title == null) return;
   title = title.replaceAll("[", "").replaceAll("]", "");
+
+  if (window.location.hostname == "github.com") {
+    title = title.split(":")[0];
+  }
+
+  title += " (" + window.location.hostname + ")";
 
   comment = "// add link //";
 
