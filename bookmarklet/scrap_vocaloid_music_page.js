@@ -2,7 +2,7 @@ javascript: (function () {
   let project_name = "pollenJP-MEMO";
   let comment = "comment variable";
   let header_lines = ["author: ", "[Vocaloid Music]"];
-  let body_lines = [""];
+  let body_lines = ["[" + window.location.hostname + "]", ""];
 
   comment = "// Get the Web Page Information //";
 
@@ -10,6 +10,7 @@ javascript: (function () {
   let title = window.prompt("Bookmark to Scrapbox", document.title);
   if (title == null) return;
   title = title.replaceAll("[", "").replaceAll("]", "");
+  title += " (" + window.location.hostname + ")";
 
   comment = "// add link //";
 
