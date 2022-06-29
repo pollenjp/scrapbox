@@ -106,8 +106,8 @@ javascript: (function () {
   let document_title_str = document.title.replace("[", "").replace("]", "");
   let link = "[" + href + "]";
   comment = "// add link //";
-  lines_body.push(" " + document_title_str);
-  lines_body.push(" " + link);
+  lines_body.push(document_title_str);
+  lines_body.push(link);
 
   comment = "// 引用文追加 //";
 
