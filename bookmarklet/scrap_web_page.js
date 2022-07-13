@@ -8,7 +8,12 @@ javascript: (function () {
   let href = window.location.href;
   let title = window.prompt("Bookmark to Scrapbox", document.title);
   if (title == null) return;
+  comment = "// replace special characters //";
   title = title.replaceAll("[", "").replaceAll("]", "");
+  comment = "// replace backquote //";
+  title = title.replaceAll("`", "");
+  comment = "// replace first slash (/) //";
+  title = title.replaceAll("^/", "");
 
   if (window.location.hostname == "github.com") {
     title = title.split(":")[0];
