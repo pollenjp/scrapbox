@@ -18,15 +18,9 @@ javascript: (function () {
 
   const date_obj = new Date();
   const date_str = date_obj.format("yyyy-MM-dd");
-  const scrapbox_page_title = "DailyReport " + date_str + " " + date_obj.format("ddd");
-  let lines_header = [
-    "#DailyReport",
-    "[date" + date_str + "]",
-    "",
-    "TODO: このページのリンクを [DailyReport] に追加",
-    "TODO: create [Notion.icon] [https://www.notion.so/]",
-    "",
-  ];
+  const scrapbox_page_title =
+    "DailyReport " + date_str + " " + date_obj.format("ddd");
+  let lines_header = ["#DailyReport", "[date" + date_str + "]", ""];
 
   comment = "// Open the page //";
 
