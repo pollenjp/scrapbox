@@ -44,42 +44,22 @@ class CustomUrlData {
 }
 
 const urlToIconName = {
-  amazon_co_jp: new CustomUrlData({
-    hostname: "www.amazon.co.jp",
-    icon_str: "[Amazon.icon]",
-  }),
-  atcoder: new CustomUrlData({
-    hostname: "atcoder.jp",
-    icon_str: "[(icon) AtCoder.icon]",
-  }),
   connpass_web_link: new CustomUrlData({
     hostname: "connpass.com",
     icon_str: "[connpass.icon]",
   }),
   discord_web_link: new CustomUrlData({
     hostname: "discord.com",
-    icon_str: "[Discord.icon]",
+    icon_str: "",
     memo: `#date${new CustomDatetime().format("yyyy-MM-dd")} `,
   }),
   evernote_web_link: new CustomUrlData({
     hostname: "www.evernote.com",
-    icon_str: "[Evernote.icon]",
+    icon_str: "",
     custom_link_name: `evernote-link`,
     memo: `[Evernote Scan Data] [Scan Data] #date${new CustomDatetime().format(
       "yyyy-MM-dd"
     )} `,
-  }),
-  github: new CustomUrlData({
-    hostname: "github.com",
-    icon_str: "[GitHub.icon]",
-  }),
-  github_gist: new CustomUrlData({
-    hostname: "gist.github.com",
-    icon_str: "[GitHub Gist.icon]",
-  }),
-  gitlab: new CustomUrlData({
-    hostname: "gitlab.com",
-    icon_str: "[GitLab.icon]",
   }),
   google_photo: new CustomUrlData({
     hostname: "photos.google.com",
@@ -108,9 +88,9 @@ const urlToIconName = {
     hostname: "hackmd.IO",
     icon_str: "[(icon) HackMD.icon]",
   }),
-  niconico: new CustomUrlData({
-    hostname: "www.nicovideo.jp",
-    icon_str: "[NicoNico.icon]",
+  InternetArchive: new CustomUrlData({
+    hostname: "web.archive.org",
+    icon_str: "[(icon) Internet Archive.icon]",
   }),
   notion: new CustomUrlData({
     hostname: "www.notion.so",
@@ -128,29 +108,17 @@ const urlToIconName = {
     hostname: "paperswithcode.com",
     icon_str: "[@paperswithcode Papers with Code.icon]",
   }),
-  pixiv: new CustomUrlData({
-    hostname: "www.pixiv.net",
-    icon_str: "[(icon) pixiv.icon]",
-  }),
   qiita: new CustomUrlData({
     hostname: "qiita.com",
     icon_str: "[Qiita.icon]",
-  }),
-  twitter: new CustomUrlData({
-    hostname: "twitter.com",
-    icon_str: "[Twitter.icon]",
   }),
   pypi: new CustomUrlData({
     hostname: "pypi.org",
     icon_str: "[(icon) PyPI.icon]",
   }),
-  twitter_mobile: new CustomUrlData({
-    hostname: "mobile.twitter.com",
-    icon_str: "[Twitter.icon]",
-  }),
-  youtube: new CustomUrlData({
-    hostname: "www.youtube.com",
-    icon_str: "[YouTube.icon]",
+  udemy: new CustomUrlData({
+    hostname: "www.udemy.com",
+    icon_str: "[Udemy.icon]",
   }),
   zenn: new CustomUrlData({
     hostname: "zenn.dev",
@@ -164,7 +132,7 @@ const urlToIconName = {
 };
 function insertUrl(url) {
   console.log("insertUrl was called!");
-  let text = `[${decodeURI(url.toString())}]`;
+  let text = "";
   for (var key in urlToIconName) {
     console.log(`url.hostname = ${url.hostname}`);
     console.log(`urlToIconName[key].hostname = ${urlToIconName[key].hostname}`);
@@ -190,12 +158,14 @@ function insertUrl(url) {
       console.log(
         `custom_url_data.custom_link_name = ${custom_url_data.custom_link_name}`
       );
+      text = "";
+      if (custom_url_data.icon_str) {
+        text = `${custom_url_data.icon_str} `;
+      }
       if (custom_url_data.custom_link_name) {
-        text = `${custom_url_data.icon_str} [${
-          custom_url_data.custom_link_name
-        } ${url.toString()}]`;
+        text += `[${custom_url_data.custom_link_name} ${url.toString()}]`;
       } else {
-        text = `${custom_url_data.icon_str} [${url.toString()}]`;
+        text += `[${url.toString()}]`;
       }
 
       if (custom_url_data.memo) {
