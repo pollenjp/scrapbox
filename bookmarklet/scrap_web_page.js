@@ -1,7 +1,7 @@
 javascript: (function () {
   let project_name = "pollenJP-MEMO";
   let comment = "comment variable";
-  let lines = ["[" + window.location.hostname + "]", ""];
+  let lines = [];
 
   comment = "// Get the Web Page Information //";
 
@@ -20,12 +20,15 @@ javascript: (function () {
   }
 
   title += " (" + window.location.hostname + ")";
+  lines.push(title);
 
   comment = "// add link //";
 
   let document_title_str = document.title
     .replaceAll("[", "")
     .replaceAll("]", "");
+
+  lines.push("[" + window.location.hostname + "]", "");
   lines.push(document_title_str);
   lines.push("[" + href + "]");
 
