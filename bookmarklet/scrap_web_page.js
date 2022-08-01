@@ -44,7 +44,7 @@ javascript: (function () {
 
   lines.push(
     "[" + window.location.hostname + "]",
-    "Scrap at [" + date.format("yyyy-MM-dd") + "]",
+    "Scrap at [date" + date.format("yyyy-MM-dd") + "]",
     ""
   );
   lines.push(document_title_str);
