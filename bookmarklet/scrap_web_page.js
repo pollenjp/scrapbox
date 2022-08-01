@@ -27,7 +27,7 @@ javascript: (function () {
   comment = "// replace backquote //";
   title = title.replaceAll("`", "");
   comment = "// replace first slash (/) //";
-  title = title.replaceAll("^/", "");
+  title = title.replace(/^\//, "\\/");
 
   if (window.location.hostname == "github.com") {
     title = title.split(":")[0];
