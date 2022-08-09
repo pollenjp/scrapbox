@@ -29,31 +29,39 @@ javascript: (function () {
   comment = "// replace first slash (/) //";
   title = title.replace(/^\//, "\\/");
 
-  let url = new URL(window.location.href);
-  let path_list = url.pathname.split("/").slice(1);
+  get_sub_path = (url_str, idx1, idx2) => {
+    let url =  new URL(url_str);
+    let path_list = url.pathname.split("/").slice(1);
+    if (idx2 > path_list.length) {
+      break;
+    }
+    let ret = ""
+    path_list.slice(idx1, idx2).forEach((name, idx) => {
+      if (idx > 0) {
+        ret += "/";
+      }
+      ret += name;
+    });
+    return ret;
+  };
+
+
+  let href = window.location.href;
 
   switch (window.location.hostname) {
     case "atcoder.jp":
-      var len = 2;
-      if (len > path_list.length) {
-        break;
-      }
-      title += " (";
-      path_list.slice(0, len).forEach((name, idx) => {
-        if (idx > 0) {
-          title += "/";
-        }
-        title += name;
-      });
-      title += ")";
+      title += " (" + get_sub_path(href, 0, 2) + ")";
       break;
 
     case "github.com":
       title = title.split(":")[0];
+      if (url.pathname.split("/").slice(1).length >= 2) {
+        title += " (" + get_sub_path(href, 0, 1) + ")";
+      }
       break;
 
     case "qiita.com":
-      title = title.split(":")[0];
+      title += " (" + get_sub_path(href, 0, 2) + ")";
       break;
   }
 
