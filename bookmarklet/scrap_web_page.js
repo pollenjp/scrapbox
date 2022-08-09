@@ -29,8 +29,29 @@ javascript: (function () {
   comment = "// replace first slash (/) //";
   title = title.replace(/^\//, "\\/");
 
-  if (window.location.hostname == "github.com") {
-    title = title.split(":")[0];
+  switch (window.location.hostname) {
+    case "github.com":
+      title = title.split(":")[0];
+      break;
+
+    case "atcoder.jp":
+      var url = new URL(window.location.href);
+      var path_list = url.pathname.split("/").slice(1);
+      var len = 2;
+      if (len > path_list.length) {
+        break;
+      }
+      target_path = path_list.slice(0, len);
+
+      title += " (";
+      target_path.forEach((name, idx) => {
+        if (idx > 0) {
+          title += "/";
+        }
+        title += name;
+      });
+      title += ")";
+      break;
   }
 
   title += " (" + window.location.hostname + ")";
