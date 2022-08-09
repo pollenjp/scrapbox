@@ -1,5 +1,6 @@
 javascript: (function () {
   let project_name = "pollenJP-MEMO";
+
   let comment = "comment variable";
   let lines = [];
 
@@ -20,6 +21,7 @@ javascript: (function () {
   const date = new Date();
 
   let href = window.location.href;
+  let this_page_url = new URL(href);
   let title = window.prompt("Bookmark to Scrapbox", document.title);
   if (title == null) return;
   comment = "// replace special characters //";
@@ -29,13 +31,12 @@ javascript: (function () {
   comment = "// replace first slash (/) //";
   title = title.replace(/^\//, "\\/");
 
-  get_sub_path = (url_str, idx1, idx2) => {
-    let url =  new URL(url_str);
+  get_sub_path = (url, idx1, idx2) => {
     let path_list = url.pathname.split("/").slice(1);
     if (idx2 > path_list.length) {
-      break;
+      throw "index is out of range!";
     }
-    let ret = ""
+    let ret = "";
     path_list.slice(idx1, idx2).forEach((name, idx) => {
       if (idx > 0) {
         ret += "/";
@@ -45,28 +46,32 @@ javascript: (function () {
     return ret;
   };
 
-
-  let href = window.location.href;
+  let tmpBody = [];
 
   switch (window.location.hostname) {
     case "atcoder.jp":
-      title += " (" + get_sub_path(href, 0, 2) + ")";
+      title += " (" + get_sub_path(this_page_url, 0, 2) + ")";
       break;
 
     case "github.com":
       title = title.split(":")[0];
-      if (url.pathname.split("/").slice(1).length >= 2) {
-        title += " (" + get_sub_path(href, 0, 1) + ")";
+      if (this_page_url.pathname.split("/").slice(1).length > 2) {
+        var path = get_sub_path(this_page_url, 0, 2);
+        title += " (" + path + ")";
+        tmpBody.push("[" + path + " (" + window.location.hostname + ")]");
       }
       break;
 
     case "qiita.com":
-      title += " (" + get_sub_path(href, 0, 2) + ")";
+      title += " (" + get_sub_path(this_page_url, 0, 2) + ")";
       break;
   }
 
   title += " (" + window.location.hostname + ")";
   lines.push(title);
+  tmpBody.forEach((line) => {
+    lines.push(line);
+  });
 
   comment = "// add link //";
 
