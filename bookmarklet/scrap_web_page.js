@@ -29,18 +29,17 @@ javascript: (function () {
   comment = "// replace first slash (/) //";
   title = title.replace(/^\//, "\\/");
 
+  let url = new URL(window.location.href);
+  let path_list = url.pathname.split("/").slice(1);
+
   switch (window.location.hostname) {
     case "atcoder.jp":
-      var url = new URL(window.location.href);
-      var path_list = url.pathname.split("/").slice(1);
       var len = 2;
       if (len > path_list.length) {
         break;
       }
-      target_path = path_list.slice(0, len);
-
       title += " (";
-      target_path.forEach((name, idx) => {
+      path_list.slice(0, len).forEach((name, idx) => {
         if (idx > 0) {
           title += "/";
         }
@@ -50,6 +49,10 @@ javascript: (function () {
       break;
 
     case "github.com":
+      title = title.split(":")[0];
+      break;
+
+    case "qiita.com":
       title = title.split(":")[0];
       break;
   }
