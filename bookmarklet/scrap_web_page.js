@@ -63,7 +63,7 @@ javascript: (function () {
       break;
 
     case "qiita.com":
-      title += " (" + get_sub_path(this_page_url, 0, 2) + ")";
+      title += " (" + get_sub_path(this_page_url, 0, 1) + ")";
       break;
   }
 
