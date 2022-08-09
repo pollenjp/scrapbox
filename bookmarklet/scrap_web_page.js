@@ -30,10 +30,6 @@ javascript: (function () {
   title = title.replace(/^\//, "\\/");
 
   switch (window.location.hostname) {
-    case "github.com":
-      title = title.split(":")[0];
-      break;
-
     case "atcoder.jp":
       var url = new URL(window.location.href);
       var path_list = url.pathname.split("/").slice(1);
@@ -51,6 +47,10 @@ javascript: (function () {
         title += name;
       });
       title += ")";
+      break;
+
+    case "github.com":
+      title = title.split(":")[0];
       break;
   }
 
