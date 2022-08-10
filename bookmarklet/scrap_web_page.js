@@ -54,11 +54,24 @@ javascript: (function () {
       break;
 
     case "github.com":
-      title = title.split(":")[0];
-      if (this_page_url.pathname.split("/").slice(1).length > 2) {
-        var path = get_sub_path(this_page_url, 0, 2);
-        title += " (" + path + ")";
-        tmpBody.push("[" + path + " (" + window.location.hostname + ")]");
+      var tmpPathList = this_page_url.pathname.split("/").slice(1);
+      switch (tmpPathList.length) {
+        case 0:
+          break;
+        case 1:
+          title = tmpPathList[0];
+          break;
+        case 2:
+          title = title.split(":")[0];
+          tmpBody.push(
+            "[" + tmpPathList[0] + " (" + window.location.hostname + ")]"
+          );
+          break;
+        default:
+          title = title.split(":")[0];
+          var path = get_sub_path(this_page_url, 0, 2);
+          title += " (" + path + ")";
+          tmpBody.push("[" + path + " (" + window.location.hostname + ")]");
       }
       break;
 
