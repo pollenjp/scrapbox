@@ -31,13 +31,21 @@ javascript: (function () {
   comment = "// replace first slash (/) //";
   title = title.replace(/^\//, "\\/");
 
+  split_path = (url_path) => {
+    let pathList = url_path.split("/").slice(1);
+    if (pathList.slice(-1)[0].length == 0) {
+      pathList = pathList.slice(pathList.length - 1);
+    }
+    return pathList;
+  };
+
   get_sub_path = (url, idx1, idx2) => {
-    let path_list = url.pathname.split("/").slice(1);
-    if (idx2 > path_list.length) {
+    let pathList = split_path(url.pathname);
+    if (idx2 > pathList.length) {
       throw "index is out of range!";
     }
     let ret = "";
-    path_list.slice(idx1, idx2).forEach((name, idx) => {
+    pathList.slice(idx1, idx2).forEach((name, idx) => {
       if (idx > 0) {
         ret += "/";
       }
@@ -54,7 +62,7 @@ javascript: (function () {
       break;
 
     case "github.com":
-      var tmpPathList = this_page_url.pathname.split("/").slice(1);
+      var tmpPathList = split_path(this_page_url.pathname);
       switch (tmpPathList.length) {
         case 0:
           break;
@@ -76,7 +84,19 @@ javascript: (function () {
       break;
 
     case "qiita.com":
-      title += " (" + get_sub_path(this_page_url, 0, 1) + ")";
+      {
+        let PathList = split_path(this_page_url.pathname);
+        let name = get_sub_path(this_page_url, 0, 1);
+        switch (PathList.length) {
+          case 1:
+            title = "[" + name + " (qiita.com)]";
+            break;
+          case 3:
+            title += " (" + name + ")";
+            tmpBody.push("[" + name + " (qiita.com)]");
+            break;
+        }
+      }
       break;
   }
 
