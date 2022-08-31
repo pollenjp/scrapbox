@@ -2,7 +2,7 @@ javascript: (function () {
   let project_name = "pollenJP-MEMO";
   let comment = "comment variable";
   let header_lines = ["author: ", "[Vocaloid Music]"];
-  let body_lines = ["[" + window.location.hostname + "]", ""];
+  let body_lines = ["[" + window.location.hostname + "]"];
 
   comment = "// Get the Web Page Information //";
 
@@ -21,6 +21,7 @@ javascript: (function () {
   const date = new Date();
 
   body_lines.push("Scrap at [date" + date.format("yyyy-MM-dd") + "]");
+  body_lines.push("");
 
   comment = "// Get the Web Page Information //";
 
