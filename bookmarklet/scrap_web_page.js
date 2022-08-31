@@ -84,7 +84,8 @@ javascript: (function () {
         }
         break;
 
-      case "qiita.com":
+      case "speakerdeck.com":
+        comment = "https://speakerdeck.com/<username>/<title>";
         {
           let pathList = split_path(this_page_url.pathname);
           let username = pathList[0];
@@ -92,8 +93,7 @@ javascript: (function () {
             case 1:
               title = username;
               break;
-            case 3:
-              comment = "https://qiita.com/<username>/items/<uuid>";
+            case 2:
               title += " (" + username + ")";
               tmpBody.push("[" + username + " (" + hostname + ")]");
               break;
@@ -101,7 +101,10 @@ javascript: (function () {
         }
         break;
 
+      case "qiita.com":
       case "zenn.dev":
+        comment = "https://qiita.com/<username>/items/<uuid>";
+        comment = "https://zenn.dev/<username>/articles/<uuid>";
         {
           let pathList = split_path(this_page_url.pathname);
           let username = pathList[0];
@@ -110,7 +113,6 @@ javascript: (function () {
               title = username;
               break;
             case 3:
-              comment = "https://zenn.dev/<username>/articles/<uuid>";
               title += " (" + username + ")";
               tmpBody.push("[" + username + " (" + hostname + ")]");
               break;
