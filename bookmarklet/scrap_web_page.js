@@ -54,57 +54,76 @@ javascript: (function () {
     return ret;
   };
 
-  let tmpBody = [];
+  {
+    let tmpBody = [];
+    let hostname = window.location.hostname;
+    switch (hostname) {
+      case "atcoder.jp":
+        title += " (" + get_sub_path(this_page_url, 0, 2) + ")";
+        break;
 
-  switch (window.location.hostname) {
-    case "atcoder.jp":
-      title += " (" + get_sub_path(this_page_url, 0, 2) + ")";
-      break;
-
-    case "github.com":
-      var tmpPathList = split_path(this_page_url.pathname);
-      switch (tmpPathList.length) {
-        case 0:
-          break;
-        case 1:
-          title = tmpPathList[0];
-          break;
-        case 2:
-          title = title.split(":")[0];
-          tmpBody.push(
-            "[" + tmpPathList[0] + " (" + window.location.hostname + ")]"
-          );
-          break;
-        default:
-          title = title.split(":")[0];
-          var path = get_sub_path(this_page_url, 0, 2);
-          title += " (" + path + ")";
-          tmpBody.push("[" + path + " (" + window.location.hostname + ")]");
-      }
-      break;
-
-    case "qiita.com":
-      {
-        let PathList = split_path(this_page_url.pathname);
-        let name = get_sub_path(this_page_url, 0, 1);
-        switch (PathList.length) {
-          case 1:
-            title = "[" + name + " (qiita.com)]";
-            break;
-          case 3:
-            title += " (" + name + ")";
-            tmpBody.push("[" + name + " (qiita.com)]");
-            break;
+      case "github.com":
+        {
+          let pathList = split_path(this_page_url.pathname);
+          switch (pathList.length) {
+            case 0:
+              break;
+            case 1:
+              title = pathList[0];
+              break;
+            case 2:
+              title = title.split(":")[0];
+              tmpBody.push("[" + pathList[0] + " (" + hostname + ")]");
+              break;
+            default:
+              title = title.split(":")[0];
+              var path = get_sub_path(this_page_url, 0, 2);
+              title += " (" + path + ")";
+              tmpBody.push("[" + path + " (" + hostname + ")]");
+          }
         }
-      }
-      break;
-  }
+        break;
 
-  title += " (" + window.location.hostname + ")";
-  lines.push(title);
-  tmpBody.forEach((line) => {
-    lines.push(line);
-  });
+      case "qiita.com":
+        {
+          let pathList = split_path(this_page_url.pathname);
+          let username = pathList[0];
+          switch (pathList.length) {
+            case 1:
+              title = username;
+              break;
+            case 3:
+              comment = "https://qiita.com/<username>/items/<uuid>";
+              title += " (" + username + ")";
+              tmpBody.push("[" + username + " (" + hostname + ")]");
+              break;
+          }
+        }
+        break;
+
+      case "zenn.dev":
+        {
+          let pathList = split_path(this_page_url.pathname);
+          let username = pathList[0];
+          switch (pathList.length) {
+            case 1:
+              title = username;
+              break;
+            case 3:
+              comment = "https://zenn.dev/<username>/articles/<uuid>";
+              title += " (" + username + ")";
+              tmpBody.push("[" + username + " (" + hostname + ")]");
+              break;
+          }
+        }
+        break;
+    }
+    title += " (" + hostname + ")";
+    lines.push(title);
+    tmpBody.forEach((line) => {
+      lines.push(line);
+    });
+  }
 
   comment = "// add link //";
 
