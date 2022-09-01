@@ -1,5 +1,5 @@
 javascript: (function () {
-  let project_name = "pollenJP-MEMO";
+  let project_name = "pollenJP-Memo";
 
   let comment = "comment variable";
   let lines = [];
@@ -30,6 +30,8 @@ javascript: (function () {
   title = title.replaceAll("`", "");
   comment = "// replace first slash (/) //";
   title = title.replace(/^\//, "\\/");
+  comment = "// remove url from title";
+  title = title.replaceAll(/(https?:\/\/[^ ]*)/g, "");
 
   split_path = (url_path) => {
     let pathList = url_path.split("/").slice(1);
