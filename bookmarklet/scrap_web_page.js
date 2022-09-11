@@ -56,6 +56,7 @@ javascript: (function () {
     return ret;
   };
 
+  let img_href_array = [];
   {
     let tmpBody = [];
     let hostname = window.location.hostname;
@@ -121,6 +122,22 @@ javascript: (function () {
           }
         }
         break;
+      case "twitter.com":
+      case "mobile.twitter.com":
+        function get_twitter_image_hrefs(images) {
+          let img_href_array = [];
+          images.forEach(function (img) {
+            if (img.alt == "Image" || img.alt == "画像") {
+              let img_url = new URL(img.src);
+              img_href_array.push(img_url.origin + img_url.pathname + ".jpg");
+            }
+          });
+          return img_href_array;
+        }
+
+        let images = [].slice.call(document.querySelectorAll("img"));
+        img_href_array = get_twitter_image_hrefs(images);
+        break;
     }
     title += " (" + hostname + ")";
     lines.push(title);
@@ -155,6 +172,12 @@ javascript: (function () {
       })
     );
   }
+
+  comment = "画像追加";
+
+  img_href_array.forEach((href) => {
+    lines.push("[" + href + "]");
+  });
 
   comment = "// 空白行の削除 //";
 
