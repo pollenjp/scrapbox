@@ -179,7 +179,7 @@ javascript: (function () {
     ""
   );
   lines.push(document_title_str);
-  lines.push("[" + href + "]");
+  lines.push(href);
 
   comment = "// 引用文追加 //";
 
