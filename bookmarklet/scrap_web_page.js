@@ -87,6 +87,27 @@ javascript: (function () {
         }
         break;
 
+      case "gist.github.com":
+        {
+          let pathList = split_path(this_page_url.pathname);
+          switch (pathList.length) {
+            case 0:
+              break;
+            case 1:
+              title = pathList[0];
+              break;
+            case 2:
+              let username = pathList[0];
+              let page_hash = pathList[1];
+              title += " (" + page_hash + ") (" + username + ")";
+              tmpBody.push("[" + username + " (github.com)]");
+              break;
+            default:
+              alert("Failed: " + pathList);
+          }
+        }
+        break;
+
       case "speakerdeck.com":
         comment = "https://speakerdeck.com/<username>/<title>";
         {
