@@ -78,11 +78,11 @@ javascript: (function () {
               title = title.split(":")[0];
               tmpBody.push("[" + pathList[0] + " (" + hostname + ")]");
               break;
-            default:
-              title = title.split(":")[0];
-              var path = get_sub_path(this_page_url, 0, 2);
+            default: {
+              let path = get_sub_path(this_page_url, 0, 2);
               title += " (" + path + ")";
               tmpBody.push("[" + path + " (" + hostname + ")]");
+            }
           }
         }
         break;
