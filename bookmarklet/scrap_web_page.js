@@ -66,24 +66,50 @@ javascript: (function () {
         break;
 
       case "github.com":
-        {
-          let pathList = split_path(this_page_url.pathname);
-          switch (pathList.length) {
+        generateContentsGithubCom = (title, hostname, urlPathList) => {
+          let body = [];
+          switch (urlPathList.length) {
             case 0:
               break;
             case 1:
-              title = pathList[0];
+              title = urlPathList[0];
               break;
             case 2:
               title = title.split(":")[0];
-              tmpBody.push("[" + pathList[0] + " (" + hostname + ")]");
+              body.push("[" + urlPathList[0] + " (" + hostname + ")]");
               break;
             default: {
-              let path = get_sub_path(this_page_url, 0, 2);
-              title += " (" + path + ")";
-              tmpBody.push("[" + path + " (" + hostname + ")]");
+              switch (urlPathList[2]) {
+                case "blob":
+                  {
+                    title = urlPathList.join("/");
+                    let path = urlPathList.slice(0, 2).join("/");
+                    body.push("[" + path + " (" + hostname + ")]");
+                  }
+                  break;
+                case "issues":
+                default: {
+                  let path = urlPathList.slice(0, 2);
+                  title += " (" + path + ")";
+                  body.push("[" + path + " (" + hostname + ")]");
+                }
+              }
             }
           }
+
+          return {
+            title: title,
+            body: body,
+          };
+        };
+        {
+          let content = generateContentsGithubCom(
+            title,
+            hostname,
+            split_path(this_page_url.pathname)
+          );
+          title = content["title"];
+          tmpBody = tmpBody.concat(content["body"]);
         }
         break;
 
