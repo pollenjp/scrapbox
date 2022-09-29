@@ -89,7 +89,7 @@ javascript: (function () {
                   break;
                 case "issues":
                 default: {
-                  let path = urlPathList.slice(0, 2);
+                  let path = urlPathList.slice(0, 2).join("/");
                   title += " (" + path + ")";
                   body.push("[" + path + " (" + hostname + ")]");
                 }
