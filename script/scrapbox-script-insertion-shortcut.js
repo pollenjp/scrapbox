@@ -14,30 +14,72 @@ function insertText(text) {
 // Alt + key //
 (() => {
   const aliases = {
-    KeyC: function () {
+    KeyC: function (shiftkey /* bool */) {
+      if (shiftkey) {
+        return;
+      }
       insertText("code:");
     },
-    KeyE: function () {
-      insertText("[/icons/hr.icon]");
+    KeyE: function (shiftkey /* bool */) {
+      if (shiftkey) {
+        return;
+      }
+      const d = new CustomDate();
+      const dateFormat = "yyyy/MM/dd hh:mm:ss";
+      insertText(`${d.format(dateFormat)}`);
     },
-    KeyI: function () {
+    KeyF: function (shiftkey /* bool */) {
+      /* 押しやすさゆえに一時的な挿入キーとしての役割 */
+      if (shiftkey) {
+        insertText(" (my.cnf)");
+        return;
+      }
+      insertText("[** [pollenjp.icon] log]");
+    },
+    KeyI: function (shiftkey /* bool */) {
+      if (shiftkey) {
+        return;
+      }
       insertText("[pollenJP.icon] ( [pollenJP] ) ");
     },
-    KeyR: function () {
+    KeyM: function (shiftkey /* bool */) {
+      if (shiftkey) {
+        return;
+      }
+      insertText("[$  ] ");
+    },
+    KeyP: function (shiftkey /* bool */) {
+      if (shiftkey) {
+        return;
+      }
+      insertText(`[PERSON]`);
+    },
+    KeyR: function (shiftkey /* bool */) {
+      if (shiftkey) {
+        return;
+      }
       const d = new CustomDate();
       const dateFormat = "yyyy-MM-dd";
       insertText(`${d.format(dateFormat)}`);
     },
-    KeyS: function () {
+    KeyS: function (shiftkey /* bool */) {
+      if (shiftkey) {
+        return;
+      }
       insertText("[parent.icon]");
     },
-    KeyW: function () {},
+    KeyW: function (shiftkey /* bool */) {
+      if (shiftkey) {
+        return;
+      }
+    },
   };
 
   const onKeyDown = function (e) {
     if (e.altKey && e.code in aliases) {
+      console.log(e.code);
       e.preventDefault();
-      aliases[e.code]();
+      aliases[e.code](e.shiftKey);
     }
   };
 
