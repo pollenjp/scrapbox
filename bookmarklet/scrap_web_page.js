@@ -80,6 +80,7 @@ javascript: (function () {
               break;
             default: {
               switch (urlPathList[2]) {
+                case "tree":
                 case "blob":
                   {
                     title = urlPathList.join("/");
