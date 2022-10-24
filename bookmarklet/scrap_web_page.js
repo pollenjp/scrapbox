@@ -36,7 +36,7 @@ javascript: (function () {
   split_path = (url_path) => {
     let pathList = url_path.split("/").slice(1);
     if (pathList.slice(-1)[0].length == 0) {
-      pathList = pathList.slice(pathList.length - 1);
+      pathList = pathList.slice(0, -1);
     }
     return pathList;
   };
