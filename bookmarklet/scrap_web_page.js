@@ -66,7 +66,11 @@ javascript: (function () {
         break;
 
       case "github.com":
+      case "gitlab.com":
         generateContentsGithubCom = (title, hostname, urlPathList) => {
+          comment =
+            "urlPathList = 'https://github.com/pollenjp/scrapbox/tree/0d4300fae19958c6726653d88f0c68982450b647/bookmarklet'";
+
           let body = [];
           switch (urlPathList.length) {
             case 0:
@@ -75,7 +79,7 @@ javascript: (function () {
               title = urlPathList[0];
               break;
             case 2:
-              title = title.split(":")[0];
+              title = urlPathList.slice(0, 2).join("/");
               body.push("[" + urlPathList[0] + " (" + hostname + ")]");
               break;
             default: {
