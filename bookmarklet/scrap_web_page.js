@@ -2,6 +2,63 @@ javascript: (function () {
   let project_name = "pollenJP-Memo";
 
   let comment = "comment variable";
+
+  comment = "// Define Functions //";
+
+  generateContentsGithubCom = (title, hostname, urlPathList) => {
+    comment =
+      "urlPathList = 'https://github.com/pollenjp/scrapbox/tree/0d4300fae19958c6726653d88f0c68982450b647/bookmarklet'";
+
+    let body = [];
+    switch (urlPathList.length) {
+      case 0:
+        break;
+      case 1:
+        title = urlPathList[0];
+        break;
+      case 2:
+        title = urlPathList.slice(0, 2).join("/");
+        body.push("[" + urlPathList[0] + " (" + hostname + ")]");
+        break;
+      default: {
+        switch (urlPathList[2]) {
+          case "tree":
+          case "blob":
+            {
+              title = urlPathList.join("/");
+              let path = urlPathList.slice(0, 2).join("/");
+              body.push("[" + path + " (" + hostname + ")]");
+            }
+            break;
+          case "issues":
+          default: {
+            let path = urlPathList.slice(0, 2).join("/");
+            title += " (" + path + ")";
+            body.push("[" + path + " (" + hostname + ")]");
+          }
+        }
+      }
+    }
+
+    return {
+      title: title,
+      body: body,
+    };
+  };
+
+  function get_twitter_image_hrefs(images) {
+    let img_href_array = [];
+    images.forEach(function (img) {
+      if (img.alt == "Image" || img.alt == "画像") {
+        let img_url = new URL(img.src);
+        img_href_array.push(img_url.origin + img_url.pathname + ".jpg");
+      }
+    });
+    return img_href_array;
+  }
+
+  comment = "// End Define Functions //";
+
   let lines = [];
 
   comment = "// Get the Web Page Information //";
@@ -66,78 +123,36 @@ javascript: (function () {
         break;
 
       case "github.com":
-      case "gitlab.com":
-        generateContentsGithubCom = (title, hostname, urlPathList) => {
-          comment =
-            "urlPathList = 'https://github.com/pollenjp/scrapbox/tree/0d4300fae19958c6726653d88f0c68982450b647/bookmarklet'";
+      case "gitlab.com": {
+        let content = generateContentsGithubCom(
+          title,
+          hostname,
+          split_path(this_page_url.pathname)
+        );
+        title = content["title"];
+        tmpBody = tmpBody.concat(content["body"]);
+        break;
+      }
 
-          let body = [];
-          switch (urlPathList.length) {
-            case 0:
-              break;
-            case 1:
-              title = urlPathList[0];
-              break;
-            case 2:
-              title = urlPathList.slice(0, 2).join("/");
-              body.push("[" + urlPathList[0] + " (" + hostname + ")]");
-              break;
-            default: {
-              switch (urlPathList[2]) {
-                case "tree":
-                case "blob":
-                  {
-                    title = urlPathList.join("/");
-                    let path = urlPathList.slice(0, 2).join("/");
-                    body.push("[" + path + " (" + hostname + ")]");
-                  }
-                  break;
-                case "issues":
-                default: {
-                  let path = urlPathList.slice(0, 2).join("/");
-                  title += " (" + path + ")";
-                  body.push("[" + path + " (" + hostname + ")]");
-                }
-              }
-            }
-          }
-
-          return {
-            title: title,
-            body: body,
-          };
-        };
-        {
-          let content = generateContentsGithubCom(
-            title,
-            hostname,
-            split_path(this_page_url.pathname)
-          );
-          title = content["title"];
-          tmpBody = tmpBody.concat(content["body"]);
+      case "gist.github.com": {
+        let pathList = split_path(this_page_url.pathname);
+        switch (pathList.length) {
+          case 0:
+            break;
+          case 1:
+            title = pathList[0];
+            break;
+          case 2:
+            let username = pathList[0];
+            let page_hash = pathList[1];
+            title += " (" + page_hash + ") (" + username + ")";
+            tmpBody.push("[" + username + " (github.com)]");
+            break;
+          default:
+            alert("Failed: " + pathList);
         }
         break;
-
-      case "gist.github.com":
-        {
-          let pathList = split_path(this_page_url.pathname);
-          switch (pathList.length) {
-            case 0:
-              break;
-            case 1:
-              title = pathList[0];
-              break;
-            case 2:
-              let username = pathList[0];
-              let page_hash = pathList[1];
-              title += " (" + page_hash + ") (" + username + ")";
-              tmpBody.push("[" + username + " (github.com)]");
-              break;
-            default:
-              alert("Failed: " + pathList);
-          }
-        }
-        break;
+      }
 
       case "speakerdeck.com":
         comment = "https://speakerdeck.com/<username>/<title>";
@@ -153,43 +168,33 @@ javascript: (function () {
               tmpBody.push("[" + username + " (" + hostname + ")]");
               break;
           }
+          break;
         }
-        break;
 
       case "qiita.com":
-      case "zenn.dev":
+      case "zenn.dev": {
         comment = "https://qiita.com/<username>/items/<uuid>";
         comment = "https://zenn.dev/<username>/articles/<uuid>";
-        {
-          let pathList = split_path(this_page_url.pathname);
-          let username = pathList[0];
-          switch (pathList.length) {
-            case 1:
-              title = username;
-              break;
-            case 3:
-              title += " (" + username + ")";
-              tmpBody.push("[" + username + " (" + hostname + ")]");
-              break;
-          }
+        let pathList = split_path(this_page_url.pathname);
+        let username = pathList[0];
+        switch (pathList.length) {
+          case 1:
+            title = username;
+            break;
+          case 3:
+            title += " (" + username + ")";
+            tmpBody.push("[" + username + " (" + hostname + ")]");
+            break;
         }
         break;
-      case "twitter.com":
-      case "mobile.twitter.com":
-        function get_twitter_image_hrefs(images) {
-          let img_href_array = [];
-          images.forEach(function (img) {
-            if (img.alt == "Image" || img.alt == "画像") {
-              let img_url = new URL(img.src);
-              img_href_array.push(img_url.origin + img_url.pathname + ".jpg");
-            }
-          });
-          return img_href_array;
-        }
+      }
 
+      case "twitter.com":
+      case "mobile.twitter.com": {
         let images = [].slice.call(document.querySelectorAll("img"));
         img_href_array = get_twitter_image_hrefs(images);
         break;
+      }
     }
     title += " (" + hostname + ")";
     lines.push(title);
