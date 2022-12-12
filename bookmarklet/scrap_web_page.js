@@ -483,7 +483,14 @@ javascript: (function () {
      *
      */
     preAtVideoPage() {
-      let elem = this._document
+      let channelUrl = new URL(
+        this._document
+          .getElementById("above-the-fold")
+          .querySelector("#top-row")
+          .querySelector("#owner")
+          .getElementsByTagName("a")[0].href
+      );
+      let channelName = this._document
         .getElementById("above-the-fold")
         .querySelector("#top-row")
         .querySelector("#owner")
@@ -492,9 +499,7 @@ javascript: (function () {
         .querySelector("#container")
         .querySelector("#text-container")
         .querySelector("#text")
-        .getElementsByTagName("a")[0];
-      let channelUrl = new URL(elem.href);
-      let channelName = elem.text;
+        .getElementsByTagName("a")[0].text;
 
       this._body.push(
         [
