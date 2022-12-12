@@ -184,11 +184,11 @@ javascript: (function () {
      */
     #parseMiddleCommon() {
       this._body.push(
-        "[" + this._url.hostname + "]",
-        "Scrap at [date" + date.format("yyyy-MM-dd") + "]",
+        `[${this._url.hostname}]`,
+        `Scrap at [date${date.format("yyyy-MM-dd")}]`,
         "",
-        "`" + this._document.title + "`",
-        this._url.toString(),
+        `\`${this._document.title}\``,
+        `${this._url.toString()}`,
         ""
       );
     }
@@ -208,7 +208,7 @@ javascript: (function () {
     #parsePostCommon() {
       /* title */
 
-      this._title += " (" + this._url.hostname + ")";
+      this._title += ` (${this._url.hostname})`;
       this._body.unshift(this._title);
 
       /* body */
@@ -219,7 +219,7 @@ javascript: (function () {
         lines.push(
           quote.split(/\n/g).map(function (line) {
             if (line !== "") {
-              return "  > " + line;
+              return `  > ${line}`;
             }
           })
         );
@@ -260,7 +260,7 @@ javascript: (function () {
      *
      */
     parsePreCustom() {
-      this._title += " (" + this._urlPathList.slice(0, 2).join("/") + ")";
+      this._title += ` (${this._urlPathList.slice(0, 2).join("/")})`;
     }
 
     /**
@@ -332,8 +332,8 @@ javascript: (function () {
       let username = this._urlPathList[0];
       let reposName = this._urlPathList[1];
 
-      this._title = username + "/" + reposName;
-      this._body.push("[" + username + " (" + this._url.hostname + ")]");
+      this._title = `${username}/${reposName}`;
+      this._body.push(`[${username} (${this._url.hostname})]`);
     }
 
     /**
@@ -346,9 +346,7 @@ javascript: (function () {
 
       this._title = this._urlPathList.join("/");
 
-      this._body.push(
-        "[" + username + "/" + reposName + " (" + this._url.hostname + ")]"
-      );
+      this._body.push(`[${username}/${reposName} (${this._url.hostname})]`);
     }
 
     /**
@@ -358,7 +356,7 @@ javascript: (function () {
       this._title += returnTitlePathPart(this._url.pathname);
 
       let path = this._urlPathList.slice(0, 2).join("/");
-      this._body.push("[" + path + " (" + this._url.hostname + ")]");
+      this._body.push(`[${path} (${this._url.hostname})]`);
     }
   }
 
@@ -382,11 +380,11 @@ javascript: (function () {
           let username = this._urlPathList[0];
 
           this._title = this._urlPathList.join("/");
-          this._body.push("[" + username + " (" + this._url.hostname + ")]");
+          this._body.push(`[${username} (${this._url.hostname})]`);
           break;
         }
         default: {
-          alert("Failed: " + this._urlPathList);
+          alert(`Failed: ${this._urlPathList}`);
         }
       }
     }
@@ -413,7 +411,7 @@ javascript: (function () {
           break;
         case 3:
           this._title += returnTitlePathPart(this._url.pathname);
-          this._body.push("[" + username + " (" + this._url.hostname + ")]");
+          this._body.push(`[${username} (${this._url.hostname})]`);
           break;
         default:
           this._title += returnTitlePathPart(this._url.pathname);
@@ -442,7 +440,7 @@ javascript: (function () {
         }
         case 2: {
           this._title += returnTitlePathPart(this._url.pathname);
-          this._body.push("[" + username + " (" + this._url.hostname + ")]");
+          this._body.push(`[${username} (${this._url.hostname})]`);
           break;
         }
       }
@@ -470,7 +468,7 @@ javascript: (function () {
       getTwitterImageUrls(
         [].slice.call(this._document.querySelector("img"))
       ).forEach((url) => {
-        this._body.push("[" + url.toString() + "]");
+        this._body.push(`[${url.toString()}]`);
       });
     }
   }
@@ -502,14 +500,9 @@ javascript: (function () {
         .getElementsByTagName("a")[0].text;
 
       this._body.push(
-        [
-          "[",
-          channelName,
-          returnTitlePathPart(channelUrl.pathname),
-          " (",
-          this._url.hostname,
-          ")]",
-        ].join("")
+        `[${channelName}${returnTitlePathPart(channelUrl.pathname)} (${
+          this._url.hostname
+        })]`
       );
     }
 
@@ -519,12 +512,12 @@ javascript: (function () {
     postAtVideoPage() {
       let video_id = this._url.searchParams.get("v");
       let thumbnail_image_url = new URL(
-        ["https://img.youtube.com/vi/", video_id, "/maxresdefault.jpg"].join("")
+        `https://img.youtube.com/vi/${video_id}/maxresdefault.jpg`
       );
 
       this._body.push(
-        "[" + this._url.toString() + "]",
-        "[" + thumbnail_image_url.toString() + "]"
+        `[${this._url.toString()}]`,
+        `[${thumbnail_image_url.toString()}]`
       );
     }
 
@@ -542,12 +535,9 @@ javascript: (function () {
         .querySelector("#text-container")
         .querySelector("#text").innerHTML;
       let channelId = this._urlPathList[0];
-      let channelUrl = new URL(this._url.origin + "/" + channelId);
+      let channelUrl = new URL(`${this._url.origin}/${channelId}`);
 
-      this._title = [
-        channelName,
-        returnTitlePathPart(channelUrl.pathname),
-      ].join("");
+      this._title = `${channelName}${returnTitlePathPart(channelUrl.pathname)}`;
 
       let imageUrl = new URL(
         this._document
@@ -557,7 +547,7 @@ javascript: (function () {
           .querySelector("#avatar")
           .querySelector("#img").src
       );
-      this._body.push("[" + imageUrl.toString() + "#.jpg]");
+      this._body.push(`[${imageUrl.toString()}#.jpg]`);
     }
 
     /**
@@ -678,12 +668,11 @@ javascript: (function () {
 
     console.log(data);
     window.open(
-      "https://scrapbox.io/" +
-        encodeURIComponent(project_name) +
-        "/" +
-        encodeURIComponent(data.title.trim()) +
-        "?body=" +
-        encodeURIComponent(data.body.join("\n"))
+      `https://scrapbox.io/${encodeURIComponent(
+        project_name
+      )}/${encodeURIComponent(data.title.trim())}?body=${encodeURIComponent(
+        data.body.join("\n")
+      )}`
     );
   }
 })();
