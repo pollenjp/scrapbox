@@ -37,8 +37,9 @@ javascript: (function () {
       .replace("ss", ("0" + this.getSeconds()).slice(-2));
   };
 
-  function split_url_path(url_path) {
-    let pathList = url_path.split("/").slice(1);
+  comment = "urlPath:string";
+  function splitUrlPath(urlPath) {
+    let pathList = urlPath.split("/").slice(1);
     if (pathList.slice(-1)[0].length == 0) {
       pathList = pathList.slice(0, -1);
     }
@@ -69,7 +70,7 @@ javascript: (function () {
 
   comment = "// End Define Functions //";
 
-  comment = "// Define Parsers //";
+  comment = "// PageParser Classes //";
 
   comment = "params";
   comment = "- title:string";
@@ -91,7 +92,7 @@ javascript: (function () {
       comment = " 'bookmarklet',";
       comment = "]";
 
-      this._urlPathList = split_url_path(this._url.pathname);
+      this._urlPathList = splitUrlPath(this._url.pathname);
     }
 
     do() {
@@ -263,25 +264,6 @@ javascript: (function () {
     parsePostCustom() {}
   }
 
-  class SpeackerdeckComPageParser extends PageParser {
-    parsePreCustom() {
-      let username = pathList[0];
-      switch (this._urlPathList.length) {
-        case 1: {
-          this._title = username;
-          break;
-        }
-        case 2: {
-          this._title += returnTitlePathPart(this._url.pathname);
-          this._body.push("[" + username + " (" + this._url.hostname + ")]");
-          break;
-        }
-      }
-    }
-
-    parsePostCustom() {}
-  }
-
   class QiitaComPageParser extends PageParser {
     parsePreCustom() {
       let username = this._urlPathList[0];
@@ -301,17 +283,139 @@ javascript: (function () {
     parsePostCustom() {}
   }
 
+  class SpeackerdeckComPageParser extends PageParser {
+    parsePreCustom() {
+      let username = pathList[0];
+      switch (this._urlPathList.length) {
+        case 1: {
+          this._title = username;
+          break;
+        }
+        case 2: {
+          this._title += returnTitlePathPart(this._url.pathname);
+          this._body.push("[" + username + " (" + this._url.hostname + ")]");
+          break;
+        }
+      }
+    }
+
+    parsePostCustom() {}
+  }
+
   class TwitterComPageParser extends PageParser {
     parsePreCustom() {}
 
     parsePostCustom() {
       get_twitter_image_hrefs(
-        [].slice.call(this._document.querySelectorAll("img"))
+        [].slice.call(this._document.querySelector("img"))
       ).forEach((href) => {
         this._body.push("[" + href + "]");
       });
     }
   }
+
+  class YouTubeComPageParser extends PageParser {
+    preAtVideoPage() {
+      let elem = this._document
+        .getElementById("above-the-fold")
+        .querySelector("#top-row")
+        .querySelector("#owner")
+        .querySelector("#upload-info")
+        .querySelector("#channel-name")
+        .querySelector("#container")
+        .querySelector("#text-container")
+        .querySelector("#text")
+        .getElementsByTagName("a")[0];
+      let channelUrl = new URL(elem.href);
+      let channelName = elem.text;
+
+      this._body.push(
+        [
+          "[",
+          channelName,
+          returnTitlePathPart(channelUrl.pathname),
+          " (",
+          this._url.hostname,
+          ")]",
+        ].join("")
+      );
+    }
+
+    postAtVideoPage() {
+      let video_id = this._url.searchParams.get("v");
+      let thumbnail_image_url = new URL(
+        ["https://img.youtube.com/vi/", video_id, "/maxresdefault.jpg"].join("")
+      );
+
+      this._body.push(
+        "[" + thumbnail_image_url.toString() + "]",
+        "[" + this._url.toString() + "]"
+      );
+    }
+
+    postAtUserPage() {
+      let channelName = this._document
+        .getElementById("channel-container")
+        .querySelector("#channel-header")
+        .querySelector("#channel-header-container")
+        .querySelector("#inner-header-container")
+        .querySelector("#meta")
+        .querySelector("#container")
+        .querySelector("#text-container")
+        .querySelector("#text").innerHTML;
+      let imageUrl = new URL(
+        this._document
+          .getElementById("channel-container")
+          .querySelector("#channel-header")
+          .querySelector("#channel-header-container")
+          .querySelector("#avatar")
+          .querySelector("#img").src
+      );
+      let channelId = this._urlPathList[0];
+      let channelUrl = new URL(
+        "https://" + this._url.hostname + "/" + channelId
+      );
+
+      this._title = [
+        channelName,
+        returnTitlePathPart(channelUrl.pathname),
+      ].join("");
+
+      this._body.push("[" + imageUrl.toString() + "#.jpg]");
+    }
+
+    parsePreCustom() {
+      switch (this._urlPathList[0]) {
+        case "watch": {
+          this.preAtVideoPage();
+          return;
+        }
+      }
+
+      console.log("debug: no processing.");
+    }
+
+    parsePostCustom() {
+      switch (this._urlPathList[0]) {
+        case "watch": {
+          comment = "video url";
+          this.postAtVideoPage();
+          return;
+        }
+
+        default: {
+          if (this._urlPathList[0].slice(0, 1) == "@") {
+            this.postAtUserPage();
+            return;
+          }
+        }
+      }
+
+      console.log("debug: no processing.");
+    }
+  }
+
+  comment = "// End PageParser Classes //";
 
   function parsePage({ title, this_page_url, document } = {}) {
     let tmpBody = [];
@@ -365,6 +469,14 @@ javascript: (function () {
       case "twitter.com":
       case "mobile.twitter.com": {
         return new TwitterComPageParser({
+          title: title,
+          url: this_page_url,
+          document: document,
+        }).do();
+      }
+
+      case "www.youtube.com": {
+        return new YouTubeComPageParser({
           title: title,
           url: this_page_url,
           document: document,
