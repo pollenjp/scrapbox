@@ -1,29 +1,39 @@
 javascript: (function () {
   let project_name = "pollenJP-Memo";
 
-  let comment = "comment variable";
-
-  comment = "// Define data classes //";
-
-  comment = "params";
-  comment = "- title:string";
-  comment = "- body[:string] ";
-  comment = "- img_href_array[:string] ";
-
+  /**
+   * dataclass
+   */
   class ParsedData {
-    constructor({ title, body } = []) {
+    /**
+     *
+     * @param {string} title
+     * @param {Array} body
+     */
+    constructor(title, body) {
+      /**
+       * title
+       * @type {string}
+       */
       this._title = title;
+
+      /**
+       * body
+       * @type {Array<string>}
+       */
       this._body = body;
     }
+
     get title() {
       return this._title;
     }
+
     get body() {
       return this._body;
     }
   }
 
-  comment = "// Define Functions //";
+  /* Define Functions */
 
   Date.prototype.format = function (format) {
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -37,7 +47,11 @@ javascript: (function () {
       .replace("ss", ("0" + this.getSeconds()).slice(-2));
   };
 
-  comment = "urlPath:string";
+  /**
+   *
+   * @param {string} urlPath
+   * @returns {Array<String>}
+   */
   function splitUrlPath(urlPath) {
     let pathList = urlPath.split("/").slice(1);
     if (pathList.slice(-1)[0].length == 0) {
@@ -46,7 +60,11 @@ javascript: (function () {
     return pathList;
   }
 
-  comment = "path:string";
+  /**
+   *
+   * @param {string} path
+   * @returns
+   */
   function returnTitlePathPart(path) {
     if (path.length == 1) {
       return "";
@@ -54,47 +72,84 @@ javascript: (function () {
     return " (" + path + ")";
   }
 
-  comment = "params";
-  comment = "- images:NodeList[:HTMLElement]";
-  comment = "return:[:string]";
-  function get_twitter_image_hrefs(images) {
-    let img_href_array = [];
-    images.forEach(function (img) {
-      if (img.alt == "Image" || img.alt == "画像") {
-        let img_url = new URL(img.src);
-        img_href_array.push(img_url.origin + img_url.pathname + ".jpg");
+  /**
+   *
+   * @param {NodeList} imageElems
+   * @returns {Array<URL>}
+   */
+  function getTwitterImageUrls(imageElems) {
+    /**
+     * Image URLs
+     * @type {Array<URL>}
+     */
+    let imgUrls = [];
+    imageElems.forEach(function (imgElem) {
+      if (imgElem.alt == "Image" || imgElem.alt == "画像") {
+        let img_url = new URL(imgElem.src);
+        imgUrls.push(new URL(img_url.origin + img_url.pathname + ".jpg"));
       }
     });
-    return img_href_array;
+    return imgUrls;
   }
 
-  comment = "// End Define Functions //";
+  /* End Define Functions */
 
-  comment = "// PageParser Classes //";
-
-  comment = "params";
-  comment = "- title:string";
-  comment = "- url:URL";
-
+  /**
+   * Base Class
+   */
   class PageParser {
-    constructor({ title, url, document } = {}) {
+    /**
+     *
+     * @param {string} title
+     * @param {URL} url
+     * @param {Document} document
+     */
+    constructor(title, url, document) {
+      /**
+       * title
+       * @type {string}
+       */
       this._title = title;
+
+      /**
+       * body
+       * @type {Array<String>}
+       */
       this._body = [];
+
+      /**
+       * url
+       * @type {URL}
+       */
       this._url = url;
+
+      /**
+       * document
+       * @type {Document}
+       */
       this._document = document;
 
-      comment =
-        "https://github.com/pollenjp/scrapbox/tree/0d4300fae19958c6726653d88f0c68982450b647/bookmarklet";
-      comment = "=> [";
-      comment = " 'pollenjp',";
-      comment = " 'scrapbox',";
-      comment = " '0d4300fae19958c6726653d88f0c68982450b647',";
-      comment = " 'bookmarklet',";
-      comment = "]";
-
+      /**
+       */
+      /**
+       * Url Path List
+       * @type {Array<String>}
+       * @description
+       *   "https://github.com/pollenjp/scrapbox/tree/0d4300fae19958c6726653d88f0c68982450b647/bookmarklet";
+       *   => [
+       *   'pollenjp',
+       *   'scrapbox',
+       *   '0d4300fae19958c6726653d88f0c68982450b647',
+       *   'bookmarklet',
+       *   ]
+       */
       this._urlPathList = splitUrlPath(this._url.pathname);
     }
 
+    /**
+     *
+     * @returns {ParsedData}
+     */
     do() {
       console.log("parsePreCommon");
       this.#parsePreCommon();
@@ -107,20 +162,26 @@ javascript: (function () {
       console.log("parsePostCommon");
       this.#parsePostCommon();
 
-      return new ParsedData({
-        title: this._title,
-        body: this._body,
-      });
+      return new ParsedData(this._title, this._body);
     }
 
+    /**
+     *
+     */
     #parsePreCommon() {}
 
+    /**
+     * Should be override.
+     */
     parsePreCustom() {
       throw new Error(
         "Not Implemented Error: This method should be overrided."
       );
     }
 
+    /**
+     *
+     */
     #parseMiddleCommon() {
       this._body.push(
         "[" + this._url.hostname + "]",
@@ -132,19 +193,25 @@ javascript: (function () {
       );
     }
 
+    /**
+     * Should be override.
+     */
     parsePostCustom() {
       throw new Error(
         "Not Implemented Error: This method should be overrided."
       );
     }
 
+    /**
+     *
+     */
     #parsePostCommon() {
-      comment = "// title //";
+      /* title */
 
       this._title += " (" + this._url.hostname + ")";
       this._body.unshift(this._title);
 
-      comment = "// body //";
+      /* body */
 
       let quote = window.getSelection().toString();
       let lines = [];
@@ -158,7 +225,7 @@ javascript: (function () {
         );
       }
 
-      comment = "// 空白行の削除 //";
+      /* 空白行の削除 */
 
       for (var i = 0; i < lines.length; ++i) {
         if (lines[i] !== undefined) {
@@ -168,77 +235,140 @@ javascript: (function () {
     }
   }
 
+  /**
+   *
+   */
   class OtherPageParser extends PageParser {
+    /**
+     *
+     */
     parsePreCustom() {
       this._title += returnTitlePathPart(this._url.pathname);
     }
 
+    /**
+     *
+     */
     parsePostCustom() {}
   }
 
+  /**
+   * atcoder.jp
+   */
   class AtcoderJpPageParser extends PageParser {
+    /**
+     *
+     */
     parsePreCustom() {
       this._title += " (" + this._urlPathList.slice(0, 2).join("/") + ")";
     }
 
+    /**
+     *
+     */
     parsePostCustom() {}
   }
 
+  /**
+   * github.com
+   * gitlab.com
+   */
   class GitHubComPageParser extends PageParser {
+    /**
+     *
+     */
     parsePreCustom() {
       switch (this._urlPathList.length) {
         case 0:
-          break;
+          return;
         case 1: {
-          let username = this._urlPathList[0];
-          this._title = username;
-          break;
+          this.generatePageAtUserPage();
+          return;
         }
         case 2: {
-          let username = this._urlPathList[0];
-          let reposName = this._urlPathList[1];
-
-          this._title = username + "/" + reposName;
-          this._body.push("[" + username + " (" + this._url.hostname + ")]");
-          break;
+          this.generatePageAtReposRootPage();
+          return;
         }
         default: {
-          let username = this._urlPathList[0];
-          let reposName = this._urlPathList[1];
+          /**
+           * let username = this._urlPathList[0];
+           * let reposName = this._urlPathList[1];
+           */
           let itemName = this._urlPathList[2];
 
           switch (itemName) {
             case "tree":
             case "blob": {
-              this._title = this._urlPathList.join("/");
-
-              this._body.push(
-                "[" +
-                  username +
-                  "/" +
-                  reposName +
-                  " (" +
-                  this._url.hostname +
-                  ")]"
-              );
-              break;
+              this.generatePageAtBlobOrTreePage();
+              return;
             }
             case "issues":
             default: {
-              this._title += returnTitlePathPart(this._url.pathname);
-
-              let path = this._urlPathList.slice(0, 2).join("/");
-              this._body.push("[" + path + " (" + this._url.hostname + ")]");
+              this.generatePageAtOtherPage();
+              return;
             }
           }
         }
       }
     }
 
+    /**
+     *
+     */
     parsePostCustom() {}
+
+    /**
+     *
+     */
+    generatePageAtUserPage() {
+      let username = this._urlPathList[0];
+      this._title = username;
+    }
+
+    /**
+     *
+     */
+    generatePageAtReposRootPage() {
+      let username = this._urlPathList[0];
+      let reposName = this._urlPathList[1];
+
+      this._title = username + "/" + reposName;
+      this._body.push("[" + username + " (" + this._url.hostname + ")]");
+    }
+
+    /**
+     *
+     */
+    generatePageAtBlobOrTreePage() {
+      let username = this._urlPathList[0];
+      let reposName = this._urlPathList[1];
+      let itemName = this._urlPathList[2];
+
+      this._title = this._urlPathList.join("/");
+
+      this._body.push(
+        "[" + username + "/" + reposName + " (" + this._url.hostname + ")]"
+      );
+    }
+
+    /**
+     *
+     */
+    generatePageAtOtherPage() {
+      this._title += returnTitlePathPart(this._url.pathname);
+
+      let path = this._urlPathList.slice(0, 2).join("/");
+      this._body.push("[" + path + " (" + this._url.hostname + ")]");
+    }
   }
 
+  /**
+   * gist.github.com
+   */
   class GistGitHubComPageParser extends PageParser {
+    /**
+     *
+     */
     parsePreCustom() {
       switch (this._urlPathList.length) {
         case 0:
@@ -261,10 +391,20 @@ javascript: (function () {
       }
     }
 
+    /**
+     *
+     */
     parsePostCustom() {}
   }
 
+  /**
+   * qiita.com
+   * zenn.com
+   */
   class QiitaComPageParser extends PageParser {
+    /**
+     *
+     */
     parsePreCustom() {
       let username = this._urlPathList[0];
       switch (this._urlPathList.length) {
@@ -280,10 +420,19 @@ javascript: (function () {
       }
     }
 
+    /**
+     *
+     */
     parsePostCustom() {}
   }
 
+  /**
+   * speackerdeck.com
+   */
   class SpeackerdeckComPageParser extends PageParser {
+    /**
+     *
+     */
     parsePreCustom() {
       let username = pathList[0];
       switch (this._urlPathList.length) {
@@ -299,22 +448,40 @@ javascript: (function () {
       }
     }
 
+    /**
+     *
+     */
     parsePostCustom() {}
   }
 
+  /**
+   *
+   */
   class TwitterComPageParser extends PageParser {
+    /**
+     *
+     */
     parsePreCustom() {}
 
+    /**
+     *
+     */
     parsePostCustom() {
-      get_twitter_image_hrefs(
+      getTwitterImageUrls(
         [].slice.call(this._document.querySelector("img"))
-      ).forEach((href) => {
-        this._body.push("[" + href + "]");
+      ).forEach((url) => {
+        this._body.push("[" + url.toString() + "]");
       });
     }
   }
 
+  /**
+   * www.youtube.com
+   */
   class YouTubeComPageParser extends PageParser {
+    /**
+     *
+     */
     preAtVideoPage() {
       let elem = this._document
         .getElementById("above-the-fold")
@@ -341,6 +508,9 @@ javascript: (function () {
       );
     }
 
+    /**
+     *
+     */
     postAtVideoPage() {
       let video_id = this._url.searchParams.get("v");
       let thumbnail_image_url = new URL(
@@ -348,11 +518,14 @@ javascript: (function () {
       );
 
       this._body.push(
-        "[" + thumbnail_image_url.toString() + "]",
-        "[" + this._url.toString() + "]"
+        "[" + this._url.toString() + "]",
+        "[" + thumbnail_image_url.toString() + "]"
       );
     }
 
+    /**
+     *
+     */
     postAtUserPage() {
       let channelName = this._document
         .getElementById("channel-container")
@@ -363,6 +536,14 @@ javascript: (function () {
         .querySelector("#container")
         .querySelector("#text-container")
         .querySelector("#text").innerHTML;
+      let channelId = this._urlPathList[0];
+      let channelUrl = new URL(this._url.origin + "/" + channelId);
+
+      this._title = [
+        channelName,
+        returnTitlePathPart(channelUrl.pathname),
+      ].join("");
+
       let imageUrl = new URL(
         this._document
           .getElementById("channel-container")
@@ -371,19 +552,13 @@ javascript: (function () {
           .querySelector("#avatar")
           .querySelector("#img").src
       );
-      let channelId = this._urlPathList[0];
-      let channelUrl = new URL(
-        "https://" + this._url.hostname + "/" + channelId
-      );
-
-      this._title = [
-        channelName,
-        returnTitlePathPart(channelUrl.pathname),
-      ].join("");
-
       this._body.push("[" + imageUrl.toString() + "#.jpg]");
     }
 
+    /**
+     *
+     * @returns
+     */
     parsePreCustom() {
       switch (this._urlPathList[0]) {
         case "watch": {
@@ -395,10 +570,14 @@ javascript: (function () {
       console.log("debug: no processing.");
     }
 
+    /**
+     *
+     * @returns
+     */
     parsePostCustom() {
       switch (this._urlPathList[0]) {
         case "watch": {
-          comment = "video url";
+          /* video url */
           this.postAtVideoPage();
           return;
         }
@@ -415,88 +594,66 @@ javascript: (function () {
     }
   }
 
-  comment = "// End PageParser Classes //";
+  /* End PageParser Classes */
 
-  function parsePage({ title, this_page_url, document } = {}) {
+  /**
+   *
+   * @param {string} title
+   * @param {URL} this_page_url
+   * @param {Document} document
+   * @returns
+   */
+  function parsePage(title, this_page_url, document) {
     let tmpBody = [];
     let data = null;
     console.log("parsePage");
     switch (this_page_url.hostname) {
       case "atcoder.jp": {
-        return new AtcoderJpPageParser({
-          title: title,
-          url: this_page_url,
-          document: document,
-        }).do();
+        return new AtcoderJpPageParser(title, this_page_url, document).do();
       }
       case "github.com":
       case "gitlab.com": {
-        return new GitHubComPageParser({
-          title: title,
-          url: this_page_url,
-          document: document,
-        }).do();
+        return new GitHubComPageParser(title, this_page_url, document).do();
       }
 
       case "gist.github.com": {
-        return new GistGitHubComPageParser({
-          title: title,
-          url: this_page_url,
-          document: document,
-        }).do();
+        return new GistGitHubComPageParser(title, this_page_url, document).do();
       }
 
       case "speakerdeck.com": {
-        comment = "https://speakerdeck.com/<username>/<title>";
-        return new SpeackerdeckComPageParser({
-          title: title,
-          url: this_page_url,
-          document: document,
-        }).do();
+        /* https://speakerdeck.com/<username>/<title> */
+        return new SpeackerdeckComPageParser(
+          title,
+          this_page_url,
+          document
+        ).do();
       }
 
       case "qiita.com":
       case "zenn.dev": {
-        comment = "https://qiita.com/<username>/items/<uuid>";
-        comment = "https://zenn.dev/<username>/articles/<uuid>";
-        return new QiitaComPageParser({
-          title: title,
-          url: this_page_url,
-          document: document,
-        }).do();
+        /**
+         *
+         * https://qiita.com/<username>/items/<uuid>
+         * https://zenn.dev/<username>/articles/<uuid>
+         */
+        return new QiitaComPageParser(title, this_page_url, document).do();
       }
 
       case "twitter.com":
       case "mobile.twitter.com": {
-        return new TwitterComPageParser({
-          title: title,
-          url: this_page_url,
-          document: document,
-        }).do();
+        return new TwitterComPageParser(title, this_page_url, document).do();
       }
 
       case "www.youtube.com": {
-        return new YouTubeComPageParser({
-          title: title,
-          url: this_page_url,
-          document: document,
-        }).do();
+        return new YouTubeComPageParser(title, this_page_url, document).do();
       }
 
       default: {
-        return new OtherPageParser({
-          title: title,
-          url: this_page_url,
-          document: document,
-        }).do();
+        return new OtherPageParser(title, this_page_url, document).do();
       }
     }
     throw new Error("No returns");
   }
-
-  comment = "///////////////////////////////////////////";
-
-  comment = "// Get the Web Page Information //";
 
   const date = new Date();
 
@@ -504,20 +661,16 @@ javascript: (function () {
     let this_page_url = new URL(window.location.href);
     let title = window.prompt("Bookmark to Scrapbox", document.title);
     if (title == null) return;
-    comment = "// replace special characters //";
+    /* replace special characters */
     title = title.replaceAll("[", "").replaceAll("]", "");
-    comment = "// replace backquote //";
+    /* replace backquote */
     title = title.replaceAll("`", "");
-    comment = "// replace first slash (/) //";
+    /* replace first slash (/) */
     title = title.replace(/^\//, "\\/");
-    comment = "// remove url from title";
+    /* remove url from title */
     title = title.replaceAll(/(https?:\/\/[^ ]*)/g, "");
 
-    let data = parsePage({
-      title: title,
-      this_page_url: this_page_url,
-      document: document,
-    });
+    let data = parsePage(title, this_page_url, document);
 
     console.log(data);
     window.open(
