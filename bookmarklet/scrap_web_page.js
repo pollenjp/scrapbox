@@ -413,7 +413,7 @@ javascript: (function () {
           break;
         case 3:
           this._title += returnTitlePathPart(this._url.pathname);
-          tmpBody.push("[" + username + " (" + this._url.hostname + ")]");
+          this._body.push("[" + username + " (" + this._url.hostname + ")]");
           break;
         default:
           this._title += returnTitlePathPart(this._url.pathname);
@@ -609,7 +609,6 @@ javascript: (function () {
    * @returns
    */
   function parsePage(title, this_page_url, document) {
-    let tmpBody = [];
     let data = null;
     console.log("parsePage");
     switch (this_page_url.hostname) {
