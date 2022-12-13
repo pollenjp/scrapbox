@@ -74,6 +74,20 @@ javascript: (function () {
 
   /**
    *
+   * @param {string} title
+   * @param {string} hostname
+   * @returns {string}
+   */
+  function safeWrapTitle(title, hostname) {
+    if (title.endsWith(`(${hostname})`)) {
+      return title;
+    }
+
+    return `${title} (${hostname})`;
+  }
+
+  /**
+   *
    * @param {NodeList} imageElems
    * @returns {Array<URL>}
    */
@@ -208,7 +222,7 @@ javascript: (function () {
     #parsePostCommon() {
       /* title */
 
-      this._title += ` (${this._url.hostname})`;
+      this._title = safeWrapTitle(this._title, this._url.hostname);
       this._body.unshift(this._title);
 
       /* body */
@@ -333,7 +347,7 @@ javascript: (function () {
       let reposName = this._urlPathList[1];
 
       this._title = `${username}/${reposName}`;
-      this._body.push(`[${username} (${this._url.hostname})]`);
+      this._body.push(`[${safeWrapTitle(username, this._url.hostname)}]`);
     }
 
     /**
@@ -346,7 +360,11 @@ javascript: (function () {
 
       this._title = this._urlPathList.join("/");
 
-      this._body.push(`[${username}/${reposName} (${this._url.hostname})]`);
+      let userPageTitle = safeWrapTitle(
+        `${username}/${reposName}`,
+        this._url.hostname
+      );
+      this._body.push(`[${userPageTitle}]`);
     }
 
     /**
@@ -356,7 +374,7 @@ javascript: (function () {
       this._title += returnTitlePathPart(this._url.pathname);
 
       let path = this._urlPathList.slice(0, 2).join("/");
-      this._body.push(`[${path} (${this._url.hostname})]`);
+      this._body.push(`[${safeWrapTitle(path, this._url.hostname)}]`);
     }
   }
 
@@ -380,7 +398,7 @@ javascript: (function () {
           let username = this._urlPathList[0];
 
           this._title = this._urlPathList.join("/");
-          this._body.push(`[${username} (${this._url.hostname})]`);
+          this._body.push(`[${safeWrapTitle(username, this._url.hostname)}]`);
           break;
         }
         default: {
@@ -411,7 +429,7 @@ javascript: (function () {
           break;
         case 3:
           this._title += returnTitlePathPart(this._url.pathname);
-          this._body.push(`[${username} (${this._url.hostname})]`);
+          this._body.push(`[${safeWrapTitle(username, this._url.hostname)}]`);
           break;
         default:
           this._title += returnTitlePathPart(this._url.pathname);
@@ -440,7 +458,7 @@ javascript: (function () {
         }
         case 2: {
           this._title += returnTitlePathPart(this._url.pathname);
-          this._body.push(`[${username} (${this._url.hostname})]`);
+          this._body.push(`[${safeWrapTitle(username, this._url.hostname)}]`);
           break;
         }
       }
@@ -453,23 +471,78 @@ javascript: (function () {
   }
 
   /**
-   *
+   * www.twitter.com
    */
   class TwitterComPageParser extends PageParser {
     /**
      *
      */
-    parsePreCustom() {}
+    parsePreCustom() {
+      switch (this._urlPathList.length) {
+        case 0: {
+          return;
+        }
+        case 1: {
+          this.parseUserPageTitle();
+        }
+        default: {
+          this.parseTweetPage();
+        }
+      }
+    }
 
     /**
      *
      */
     parsePostCustom() {
       getTwitterImageUrls(
-        [].slice.call(this._document.querySelector("img"))
+        [].slice.call(this._document.querySelectorAll("img"))
       ).forEach((url) => {
         this._body.push(`[${url.toString()}]`);
       });
+    }
+
+    parseUserPageTitle() {
+      let username = TwitterComPageParser.parseUserNameFromUrlPath(
+        thsi._url.pathname
+      );
+      this._title = this.getUserPageTitle(username);
+    }
+
+    parseTweetPage() {
+      let username = TwitterComPageParser.parseUserNameFromUrlPath(
+        this._url.pathname
+      );
+
+      this._title = `${this._title}${returnTitlePathPart(this._url.pathname)}`;
+      this._body.push(
+        `[${safeWrapTitle(
+          TwitterComPageParser.getUserPageTitle(username),
+          this._url.hostname
+        )}]`
+      );
+    }
+
+    /**
+     *
+     * @param {string} username
+     * @returns {string}
+     */
+    static getUserPageTitle(username) {
+      return username;
+    }
+
+    /**
+     *
+     * @param {string} path
+     * @returns {string}
+     */
+    static parseUserNameFromUrlPath(path) {
+      let urlPathArray = splitUrlPath(path);
+      if (urlPathArray.length < 1) {
+        alert(`Failed to get user from ${path}`);
+      }
+      return urlPathArray[0];
     }
   }
 
