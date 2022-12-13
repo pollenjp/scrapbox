@@ -504,7 +504,7 @@ javascript: (function () {
 
     parseUserPageTitle() {
       let username = TwitterComPageParser.parseUserNameFromUrlPath(
-        thsi._url.pathname
+        this._url.pathname
       );
       this._title = this.getUserPageTitle(username);
     }
