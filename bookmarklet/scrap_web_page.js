@@ -483,10 +483,12 @@ javascript: (function () {
           return;
         }
         case 1: {
-          this.parseUserPageTitle();
+          this.parseUserPage();
+          return;
         }
         default: {
           this.parseTweetPage();
+          return;
         }
       }
     }
@@ -502,11 +504,12 @@ javascript: (function () {
       });
     }
 
-    parseUserPageTitle() {
+    parseUserPage() {
       let username = TwitterComPageParser.parseUserNameFromUrlPath(
         this._url.pathname
       );
-      this._title = this.getUserPageTitle(username);
+      this._title = TwitterComPageParser.getUserPageTitle(username);
+      this._body.push(`[Twitter User Page]`);
     }
 
     parseTweetPage() {
@@ -529,7 +532,7 @@ javascript: (function () {
      * @returns {string}
      */
     static getUserPageTitle(username) {
-      return username;
+      return `${username} (/${username})`;
     }
 
     /**
