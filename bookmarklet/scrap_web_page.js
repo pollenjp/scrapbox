@@ -555,6 +555,48 @@ javascript: (function () {
   class YouTubeComPageParser extends PageParser {
     /**
      *
+     * @returns
+     */
+    parsePreCustom() {
+      switch (this._urlPathList[0]) {
+        case "watch": {
+          this.preAtVideoPage();
+          return;
+        }
+        default: {
+          /* user page */
+          this._body.push(`[YouTube User Page]`);
+        }
+      }
+
+      console.log("debug: no processing.");
+    }
+
+    /**
+     *
+     * @returns
+     */
+    parsePostCustom() {
+      switch (this._urlPathList[0]) {
+        case "watch": {
+          /* video url */
+          this.postAtVideoPage();
+          return;
+        }
+
+        default: {
+          if (this._urlPathList[0].slice(0, 1) == "@") {
+            this.postAtUserPage();
+            return;
+          }
+        }
+      }
+
+      console.log("debug: no processing.");
+    }
+
+    /**
+     *
      */
     preAtVideoPage() {
       let channelUrl = new URL(
@@ -564,6 +606,8 @@ javascript: (function () {
           .querySelector("#owner")
           .getElementsByTagName("a")[0].href
       );
+      let channelId = splitUrlPath(channelUrl.pathname).slice(-1);
+      let videoId = this._url.searchParams.get("v");
       let channelName = this._document
         .getElementById("above-the-fold")
         .querySelector("#top-row")
@@ -575,6 +619,7 @@ javascript: (function () {
         .querySelector("#text")
         .getElementsByTagName("a")[0].text;
 
+      this._title = `${this._title} (${videoId}) (${channelId})`;
       this._body.push(
         `[${channelName}${returnTitlePathPart(channelUrl.pathname)} (${
           this._url.hostname
@@ -586,14 +631,14 @@ javascript: (function () {
      *
      */
     postAtVideoPage() {
-      let video_id = this._url.searchParams.get("v");
-      let thumbnail_image_url = new URL(
-        `https://img.youtube.com/vi/${video_id}/maxresdefault.jpg`
+      let videoId = this._url.searchParams.get("v");
+      let thumbnailImageUrl = new URL(
+        `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
       );
 
       this._body.push(
         `[${this._url.toString()}]`,
-        `[${thumbnail_image_url.toString()}]`
+        `[${thumbnailImageUrl.toString()}]`
       );
     }
 
@@ -624,44 +669,6 @@ javascript: (function () {
           .querySelector("#img").src
       );
       this._body.push(`[${imageUrl.toString()}#.jpg]`);
-    }
-
-    /**
-     *
-     * @returns
-     */
-    parsePreCustom() {
-      switch (this._urlPathList[0]) {
-        case "watch": {
-          this.preAtVideoPage();
-          return;
-        }
-      }
-
-      console.log("debug: no processing.");
-    }
-
-    /**
-     *
-     * @returns
-     */
-    parsePostCustom() {
-      switch (this._urlPathList[0]) {
-        case "watch": {
-          /* video url */
-          this.postAtVideoPage();
-          return;
-        }
-
-        default: {
-          if (this._urlPathList[0].slice(0, 1) == "@") {
-            this.postAtUserPage();
-            return;
-          }
-        }
-      }
-
-      console.log("debug: no processing.");
     }
   }
 
