@@ -69,7 +69,7 @@ javascript: (function () {
     if (path.length == 1) {
       return "";
     }
-    return " (" + path + ")";
+    return ` (${decodeURI(path)})`;
   }
 
   /**
