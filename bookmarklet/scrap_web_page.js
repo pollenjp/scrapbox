@@ -2,7 +2,7 @@ javascript: (function () {
   let project_name = "pollenJP-Memo";
 
   /**
-   * dataclass
+   * data class
    */
   class ParsedData {
     /**
