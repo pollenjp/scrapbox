@@ -445,7 +445,7 @@ javascript: (function () {
   /**
    * speackerdeck.com
    */
-  class SpeackerdeckComPageParser extends PageParser {
+  class SpeakerdeckComPageParser extends PageParser {
     /**
      *
      */
@@ -699,7 +699,7 @@ javascript: (function () {
 
       case "speakerdeck.com": {
         /* https://speakerdeck.com/<username>/<title> */
-        return new SpeackerdeckComPageParser(
+        return new SpeakerdeckComPageParser(
           title,
           this_page_url,
           document
