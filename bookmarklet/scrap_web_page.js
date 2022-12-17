@@ -620,9 +620,9 @@ javascript: (function () {
         .getElementsByTagName("a")[0].text;
 
       let d =
-        YouTubeComPageParser.extractDateFromVideoPage(document).format(
-          "yyyy-MM-dd"
-        );
+        YouTubeComPageParser.extractVideoUploadDateFromVideoPage(
+          document
+        ).format("yyyy-MM-dd");
       this._title = `${d} ${this._title} (${videoId}) (${channelId})`;
       this._body.push(
         `[${channelName}${returnTitlePathPart(channelUrl.pathname)} (${
@@ -680,10 +680,10 @@ javascript: (function () {
      * @param {Document} document
      * @returns {Date}
      */
-    static extractDateFromVideoPage(document) {
-      /* '\n  4,056 回視聴 • 2022/03/21\n' */
+    static extractVideoUploadDateFromVideoPage(document) {
       let t = document
-        .getElementById("primary")
+        .getElementById("columns")
+        .querySelector("#primary")
         .querySelector("#primary-inner")
         .querySelector("#above-the-fold")
         .querySelector("#bottom-row")
@@ -691,13 +691,32 @@ javascript: (function () {
         .querySelector("#description-inner")
         .querySelector("#tooltip").textContent;
 
-      let dateRegex = /.*(?<date>[0-9]{4}\/[0-9]{2}\/[0-9]{2}).*/;
-      let match = dateRegex.exec(t);
+      {
+        /* '\n  4,056 回視聴 • 2022/03/21\n' */
+        let regex = /.*• (?<date>[0-9]{4}\/[0-9]{2}\/[0-9]{2}).*/;
+        let match = regex.exec(t);
 
-      return new Date(
-        /* 2011/01/32 */
-        match.groups.date
-      );
+        if (match != null) {
+          return new Date(
+            /* 2011/01/32 */
+            match.groups.date
+          );
+        }
+      }
+
+      {
+        /* 563 回視聴 • 14 時間前にライブ配信 */
+        let regex = /.*• (?<hour>[0-9]{2}) 時間前.*/;
+        let match = regex.exec(t);
+        if (match != null) {
+          let hour = match.groups.hour;
+          let d = new Date();
+          d.setHours(d.getHours() - hour);
+          return d;
+        }
+      }
+
+      return new Date();
     }
   }
 
