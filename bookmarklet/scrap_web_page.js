@@ -619,7 +619,11 @@ javascript: (function () {
         .querySelector("#text")
         .getElementsByTagName("a")[0].text;
 
-      this._title = `${this._title} (${videoId}) (${channelId})`;
+      let d =
+        YouTubeComPageParser.extractDateFromVideoPage(document).format(
+          "yyyy-MM-dd"
+        );
+      this._title = `${d} ${this._title} (${videoId}) (${channelId})`;
       this._body.push(
         `[${channelName}${returnTitlePathPart(channelUrl.pathname)} (${
           this._url.hostname
@@ -669,6 +673,31 @@ javascript: (function () {
           .querySelector("#img").src
       );
       this._body.push(`[${imageUrl.toString()}#.jpg]`);
+    }
+
+    /**
+     *
+     * @param {Document} document
+     * @returns {Date}
+     */
+    static extractDateFromVideoPage(document) {
+      /* '\n  4,056 回視聴 • 2022/03/21\n' */
+      let t = document
+        .getElementById("primary")
+        .querySelector("#primary-inner")
+        .querySelector("#above-the-fold")
+        .querySelector("#bottom-row")
+        .querySelector("#description")
+        .querySelector("#description-inner")
+        .querySelector("#tooltip").textContent;
+
+      let dateRegex = /.*(?<date>[0-9]{4}\/[0-9]{2}\/[0-9]{2}).*/;
+      let match = dateRegex.exec(t);
+
+      return new Date(
+        /* 2011/01/32 */
+        match.groups.date
+      );
     }
   }
 
