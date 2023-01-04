@@ -106,6 +106,78 @@ javascript: (function () {
     return imgUrls;
   }
 
+  /**
+   *
+   * @param {Element} htmlElement
+   * @param {string} tagName
+   * @returns
+   */
+  function getChildElementByTagName(htmlElement, tagName) {
+    tagName = tagName.toUpperCase();
+
+    for (const element of htmlElement.children) {
+      if (element.tagName == tagName) {
+        return element;
+      }
+    }
+    console.log(htmlElement);
+    throw new Error(`Element not found: ${tagName} ${htmlElement}`);
+  }
+
+  /**
+   *
+   * @param {Element} htmlElement
+   * @param {string} tagName
+   * @param {string} id
+   * @returns
+   */
+  function getChildElementByTagNameAndId(htmlElement, tagName, id) {
+    tagName = tagName.toUpperCase();
+
+    for (const element of htmlElement.children) {
+      if (element.tagName !== tagName) {
+        continue;
+      }
+      if (element.id === id) {
+        return element;
+      }
+    }
+    console.log(htmlElement);
+    throw new Error(`Element not found: ${tagName} ${id} ${htmlElement}`);
+  }
+
+  /**
+   *
+   * @param {Element} htmlElement
+   * @param {string} tagName
+   * @param {string[]} classList
+   * @returns
+   */
+  function getChildElementByTagNameAndClass(htmlElement, tagName, classList) {
+    tagName = tagName.toUpperCase();
+
+    for (const element of htmlElement.children) {
+      if (element.tagName !== tagName) {
+        continue;
+      }
+
+      let is_match = true;
+      for (const className of classList) {
+        if (!element.classList.contains(className)) {
+          is_match = false;
+          break;
+        }
+      }
+
+      if (is_match) {
+        return element;
+      }
+    }
+
+    console.log(htmlElement);
+    throw new Error(`Element not found: ${tagName} ${classList}`);
+  }
+
   /* End Define Functions */
 
   /**
@@ -563,6 +635,10 @@ javascript: (function () {
           this.preAtVideoPage();
           return;
         }
+        case "playlist": {
+          this.preAtPlaylistPage();
+          return;
+        }
         default: {
           /* user page */
           this._body.push(`[YouTube User Page]`);
@@ -582,6 +658,10 @@ javascript: (function () {
           /* video url */
           this.postAtVideoPage();
           return;
+        }
+
+        case "playlist": {
+          this.postAtPlaylistPage();
         }
 
         default: {
@@ -644,6 +724,153 @@ javascript: (function () {
         `[${this._url.toString()}]`,
         `[${thumbnailImageUrl.toString()}]`
       );
+    }
+
+    /**
+     *
+     */
+    preAtPlaylistPage() {
+      /**
+       * @param {Element} root
+       * @returns {string}
+       */
+      function getPlaylistName(root) {
+        let element = root;
+        element = getChildElementByTagName(element, "body");
+        element = getChildElementByTagName(element, "ytd-app");
+        element = getChildElementByTagNameAndId(element, "div", "content");
+        element = getChildElementByTagName(element, "ytd-page-manager");
+        element = getChildElementByTagName(element, "ytd-browse");
+        element = getChildElementByTagName(
+          element,
+          "ytd-playlist-header-renderer"
+        );
+        element = getChildElementByTagNameAndClass(element, "div", [
+          "immersive-header-container",
+          "style-scope",
+          "ytd-playlist-header-renderer",
+        ]);
+        element = getChildElementByTagNameAndClass(element, "div", [
+          "immersive-header-content",
+          "style-scope",
+          "ytd-playlist-header-renderer",
+        ]);
+        element = getChildElementByTagNameAndClass(element, "div", [
+          "thumbnail-and-metadata-wrapper",
+          "style-scope",
+          "ytd-playlist-header-renderer",
+        ]);
+        element = getChildElementByTagNameAndClass(element, "div", [
+          "metadata-wrapper",
+          "style-scope",
+          "ytd-playlist-header-renderer",
+        ]);
+        element = getChildElementByTagName(
+          element,
+          "yt-dynamic-sizing-formatted-string"
+        );
+        element = getChildElementByTagNameAndId(element, "div", "container");
+        element = getChildElementByTagNameAndId(
+          element,
+          "yt-formatted-string",
+          "text"
+        );
+        console.log(element);
+        return element.innerText;
+      }
+      let playlistName = getPlaylistName(this._document.documentElement);
+
+      /**
+       * @param {Element} root
+       * @returns {[string, URL]}
+       */
+      function getChannelNameAndURL(root) {
+        let element = root;
+        element = getChildElementByTagName(element, "body");
+        element = getChildElementByTagName(element, "ytd-app");
+        element = getChildElementByTagNameAndId(element, "div", "content");
+        element = getChildElementByTagName(element, "ytd-page-manager");
+        element = getChildElementByTagName(element, "ytd-browse");
+        element = getChildElementByTagName(
+          element,
+          "ytd-playlist-header-renderer"
+        );
+        element = getChildElementByTagNameAndClass(element, "div", [
+          "immersive-header-container",
+          "style-scope",
+          "ytd-playlist-header-renderer",
+        ]);
+        element = getChildElementByTagNameAndClass(element, "div", [
+          "immersive-header-content",
+          "style-scope",
+          "ytd-playlist-header-renderer",
+        ]);
+        element = getChildElementByTagNameAndClass(element, "div", [
+          "thumbnail-and-metadata-wrapper",
+          "style-scope",
+          "ytd-playlist-header-renderer",
+        ]);
+        element = getChildElementByTagNameAndClass(element, "div", [
+          "metadata-wrapper",
+          "style-scope",
+          "ytd-playlist-header-renderer",
+        ]);
+        element = getChildElementByTagNameAndClass(element, "div", [
+          "metadata-action-bar",
+          "style-scope",
+          "ytd-playlist-header-renderer",
+        ]);
+        element = getChildElementByTagNameAndClass(element, "div", [
+          "metadata-text-wrapper",
+          "style-scope",
+          "ytd-playlist-header-renderer",
+        ]);
+        element = getChildElementByTagNameAndClass(element, "div", [
+          "metadata-owner",
+          "style-scope",
+          "ytd-playlist-header-renderer",
+        ]);
+        element = getChildElementByTagNameAndId(
+          element,
+          "yt-formatted-string",
+          "owner-text"
+        );
+        element = getChildElementByTagName(element, "a");
+        return [element.text, new URL(element.href)];
+      }
+
+      /**
+       * @type {string}
+       */
+      let channelName;
+      /**
+       * @type {URL}
+       */
+      let channelUrl;
+      [channelName, channelUrl] = getChannelNameAndURL(
+        this._document.documentElement
+      );
+
+      console.log(channelName, channelUrl);
+
+      let playlistId = this._url.searchParams.get("list");
+      let channelId = splitUrlPath(channelUrl.pathname).slice(-1);
+
+      this._title = `${playlistName} (playlist:${playlistId}) (${channelId})`;
+      this._body.push(
+        `[${channelName}${returnTitlePathPart(channelUrl.pathname)} (${
+          this._url.hostname
+        })]`
+      );
+    }
+
+    /**
+     *
+     */
+    postAtPlaylistPage() {
+      let videoId = this._url.searchParams.get("v");
+
+      this._body.push(`[${this._url.toString()}]`);
     }
 
     /**
