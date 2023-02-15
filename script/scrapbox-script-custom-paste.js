@@ -22,7 +22,7 @@ class SpaceRemover {
     // 連続する半角スペースを1つにする
     // 肯定先読み
     text = text.replace(/ (?=[ ])/g, "");
-    text = text.replace(/[、，]/g, ",");
+    text = text.replace(/[、，]/g, ", ");
 
     text = text.replace(/。/g, ". "); // 全角 -> 半角
     text = text.replace(/．/g, ". "); // 全角 -> 半角
