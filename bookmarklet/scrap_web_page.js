@@ -522,7 +522,7 @@ javascript: (function () {
      *
      */
     parsePreCustom() {
-      let username = pathList[0];
+      let username = this._urlPathList[0];
       switch (this._urlPathList.length) {
         case 1: {
           this._title = username;
