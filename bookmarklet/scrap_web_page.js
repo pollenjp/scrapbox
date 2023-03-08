@@ -33,7 +33,9 @@ javascript: (function () {
     }
   }
 
-  /* Define Functions */
+  /*************************
+   * Define Util Functions *
+   *************************/
 
   Date.prototype.format = function (format) {
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -104,6 +106,16 @@ javascript: (function () {
       }
     });
     return imgUrls;
+  }
+
+  /**
+   * YouTube の `@username` から Scrapbox 上で紐づけるための一意なタイトルを生成する
+   *
+   * @param {string} userId
+   * @type {string}
+   */
+  function generateYouTubeUserPageTitle(userId) {
+    return `${userId} (www.youtube.com)`;
   }
 
   /**
@@ -639,9 +651,18 @@ javascript: (function () {
           this.preAtPlaylistPage();
           return;
         }
+        case "shorts": {
+          /* ex) <https://www.youtube.com/shorts/0V7LPbjRDqk> */
+          this.preAtShortsPage();
+          return;
+        }
         default: {
-          /* user page */
-          this._body.push(`[YouTube User Page]`);
+          if (this._urlPathList[0].slice(0, 1) == "@") {
+            /* user page */
+            this.preAtUserPage();
+          } else {
+            throw new Error("Not Supported URI");
+          }
         }
       }
 
@@ -664,8 +685,14 @@ javascript: (function () {
           this.postAtPlaylistPage();
         }
 
+        case "shorts": {
+          this.postAtShortsPage();
+          return;
+        }
+
         default: {
           if (this._urlPathList[0].slice(0, 1) == "@") {
+            /* user page */
             this.postAtUserPage();
             return;
           }
@@ -871,6 +898,16 @@ javascript: (function () {
       let videoId = this._url.searchParams.get("v");
 
       this._body.push(`[${this._url.toString()}]`);
+    }
+
+    /**
+     *
+     * ex) <https://www.youtube.com/@Genshin_JP>
+     */
+    preAtUserPage() {
+      let channelId = this._urlPathList[0];
+      this._body.push(`[${generateYouTubeUserPageTitle(channelId)}]`);
+      this._body.push(`[YouTube User Page]`);
     }
 
     /**
