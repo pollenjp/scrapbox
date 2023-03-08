@@ -50,6 +50,7 @@ javascript: (function () {
   };
 
   /**
+   * ex) /aaa/bbb/ccc => ["aaa", "bbb", "ccc"]
    *
    * @param {string} urlPath
    * @returns {Array<String>}
@@ -63,12 +64,14 @@ javascript: (function () {
   }
 
   /**
+   * scrapbox に生成するページのタイトルのうち URL path の部分を生成する.
    *
    * @param {string} path
    * @returns
    */
   function returnTitlePathPart(path) {
     if (path.length == 1) {
+      /* ルートパスの時は空文字を返す */
       return "";
     }
     return ` (${decodeURI(path)})`;
@@ -119,10 +122,11 @@ javascript: (function () {
   }
 
   /**
+   * get the first element having the specified tag name
    *
    * @param {Element} htmlElement
    * @param {string} tagName
-   * @returns
+   * @type {Element}
    */
   function getChildElementByTagName(htmlElement, tagName) {
     tagName = tagName.toUpperCase();
@@ -188,6 +192,34 @@ javascript: (function () {
 
     console.log(htmlElement);
     throw new Error(`Element not found: ${tagName} ${classList}`);
+  }
+
+  /**
+   *
+   * @param {Element} htmlElement
+   * @param {string} tagName
+   * @param {string} attributeName
+   * @returns
+   */
+  function getChildElementByTagNameAndAttribute(
+    htmlElement,
+    tagName,
+    attributeName
+  ) {
+    tagName = tagName.toUpperCase();
+
+    for (const element of htmlElement.children) {
+      if (element.tagName !== tagName) {
+        continue;
+      }
+      if (element.getAttribute(attributeName) !== null) {
+        return element;
+      }
+    }
+    console.log(htmlElement);
+    throw new Error(
+      `Element not found: ${tagName} / ${attributeName} / ${htmlElement}`
+    );
   }
 
   /* End Define Functions */
@@ -898,6 +930,77 @@ javascript: (function () {
       let videoId = this._url.searchParams.get("v");
 
       this._body.push(`[${this._url.toString()}]`);
+    }
+
+    /**
+     *
+     */
+    preAtShortsPage() {
+      let element = this._document.getElementById("page-manager");
+      if (element === null) {
+        throw new Error("'page-manager' id is not found");
+      }
+      element = getChildElementByTagName(element, "ytd-shorts");
+      element = getChildElementByTagNameAndId(
+        element,
+        "div",
+        "shorts-container"
+      );
+      element = getChildElementByTagNameAndId(
+        element,
+        "div",
+        "shorts-inner-container"
+      );
+      /* get element having `is-active` option */
+      element = getChildElementByTagNameAndAttribute(
+        element,
+        "ytd-reel-video-renderer",
+        "is-active"
+      );
+      element = getChildElementByTagNameAndClass(element, "div", [
+        "overlay",
+        "style-scope",
+        "ytd-reel-video-renderer",
+      ]);
+      element = getChildElementByTagName(
+        element,
+        "ytd-reel-player-overlay-renderer"
+      );
+      element = getChildElementByTagNameAndId(element, "div", "overlay");
+      element = getChildElementByTagName(
+        element,
+        "ytd-reel-player-header-renderer"
+      );
+      element = getChildElementByTagNameAndId(
+        element,
+        "div",
+        "channel-container"
+      );
+      element = getChildElementByTagNameAndId(element, "div", "channel-info");
+      element = getChildElementByTagName(element, "ytd-channel-name");
+      element = getChildElementByTagNameAndId(element, "div", "container");
+      element = getChildElementByTagNameAndId(element, "div", "text-container");
+      element = getChildElementByTagNameAndId(
+        element,
+        "yt-formatted-string",
+        "text"
+      );
+      let channelUrl = new URL(getChildElementByTagName(element, "a").href);
+      let channelId = splitUrlPath(channelUrl.pathname)[0];
+
+      this._body.push(`[${generateYouTubeUserPageTitle(channelId)}]`);
+    }
+
+    /**
+     *
+     */
+    postAtShortsPage() {
+      let videoId = this._urlPathList.slice(-1)[0];
+      let thumbnailImageUrl = new URL(
+        `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+      );
+
+      this._body.push(`[${thumbnailImageUrl.toString()}]`);
     }
 
     /**
