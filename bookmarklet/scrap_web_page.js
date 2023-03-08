@@ -224,6 +224,10 @@ javascript: (function () {
 
   /* End Define Functions */
 
+  /***************
+   * Page Parser *
+   ***************/
+
   /**
    * Base Class
    */
@@ -988,6 +992,9 @@ javascript: (function () {
       let channelUrl = new URL(getChildElementByTagName(element, "a").href);
       let channelId = splitUrlPath(channelUrl.pathname)[0];
 
+      this._title = `${this._document.title}${returnTitlePathPart(
+        this._url.pathname
+      )}`;
       this._body.push(`[${generateYouTubeUserPageTitle(channelId)}]`);
     }
 
