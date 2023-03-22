@@ -767,11 +767,7 @@ javascript: (function () {
           document
         ).format("yyyy-MM-dd");
       this._title = `${d} ${this._title} (${videoId}) (${channelId})`;
-      this._body.push(
-        `[${channelName}${returnTitlePathPart(channelUrl.pathname)} (${
-          this._url.hostname
-        })]`
-      );
+      this._body.push(`[${generateYouTubeUserPageTitle(channelId)}]`);
     }
 
     /**
@@ -920,11 +916,7 @@ javascript: (function () {
       let channelId = splitUrlPath(channelUrl.pathname).slice(-1);
 
       this._title = `${playlistName} (playlist:${playlistId}) (${channelId})`;
-      this._body.push(
-        `[${channelName}${returnTitlePathPart(channelUrl.pathname)} (${
-          this._url.hostname
-        })]`
-      );
+      this._body.push(`[${generateYouTubeUserPageTitle(channelId)}]`);
     }
 
     /**
@@ -1012,18 +1004,9 @@ javascript: (function () {
 
     /**
      *
-     * ex) <https://www.youtube.com/@Genshin_JP>
+     * @returns {{channelName: string, channelId: string, channelUrl: URL}}
      */
-    preAtUserPage() {
-      let channelId = this._urlPathList[0];
-      this._body.push(`[${generateYouTubeUserPageTitle(channelId)}]`);
-      this._body.push(`[YouTube User Page]`);
-    }
-
-    /**
-     *
-     */
-    postAtUserPage() {
+    getChannelInfoAtUserPage() {
       let channelName = this._document
         .getElementById("channel-container")
         .querySelector("#channel-header")
@@ -1034,9 +1017,37 @@ javascript: (function () {
         .querySelector("#text-container")
         .querySelector("#text").innerHTML;
       let channelId = this._urlPathList[0];
-      let channelUrl = new URL(`${this._url.origin}/${channelId}`);
+      return {
+        channelName: channelName,
+        channelId: channelId,
+        channelUrl: new URL(`${this._url.origin}/${channelId}`),
+      };
+    }
 
-      this._title = `${channelName}${returnTitlePathPart(channelUrl.pathname)}`;
+    /**
+     *
+     * ex) <https://www.youtube.com/@Genshin_JP>
+     */
+    preAtUserPage() {
+      let chInfo = this.getChannelInfoAtUserPage();
+
+      this._title = `${generateYouTubeUserPageTitle(chInfo.channelId)}`;
+
+      /* support deprecated page format */
+      let t = `${chInfo.channelName}${returnTitlePathPart(
+        chInfo.channelUrl.pathname
+      )}`;
+      t = safeWrapTitle(t, this._url.hostname);
+      this._body.push(`[${t}]`);
+
+      this._body.push(`[YouTube User Page]`);
+    }
+
+    /**
+     *
+     */
+    postAtUserPage() {
+      /* Image URL */
 
       let imageUrl = new URL(
         this._document
@@ -1046,6 +1057,7 @@ javascript: (function () {
           .querySelector("#avatar")
           .querySelector("#img").src
       );
+
       this._body.push(`[${imageUrl.toString()}#.jpg]`);
     }
 
