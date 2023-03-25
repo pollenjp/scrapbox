@@ -467,6 +467,7 @@ javascript: (function () {
       let reposName = this._urlPathList[1];
 
       this._title = `${username}/${reposName}`;
+      this._body.push(`[${this._url.hostname}/${username}/${reposName}]`);
       this._body.push(`[${safeWrapTitle(username, this._url.hostname)}]`);
     }
 
