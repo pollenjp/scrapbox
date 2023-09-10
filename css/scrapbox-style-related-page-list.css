@@ -1,0 +1,167 @@
+@media (min-width: 768px) {
+    div.page-wrapper .related-page-list {
+        flex-basis: 100px !important;
+    }
+
+    div.page-wrapper .related-page-list .relation-label {
+        width: 100px !important;
+    }
+}
+
+@media (min-width: 1000px) {
+    div.page-wrapper .related-page-list {
+        flex-basis: 200px !important;
+    }
+
+    div.page-wrapper .related-page-list .relation-label {
+        width: 200px !important;
+    }
+
+    div.page-wrapper .related-page-list .grid li {
+        width: 100px;
+    }
+}
+
+@media (min-width: 1240px) {
+    div.page-wrapper .related-page-list {
+        flex-basis: 300px !important;
+    }
+
+    div.page-wrapper .related-page-list .relation-label {
+        width: 300px !important;
+    }
+
+    div.page-wrapper .related-page-list .grid li {
+        width: 100px;
+    }
+}
+
+@media (min-width: 768px) {
+    div.page-wrapper {
+        display: flex;
+    }
+
+    div.page-wrapper .drag-and-drop-enter {
+        order: 2;
+        /* width: calc(100% - 200px); */
+        width: 100%;
+        margin-left: 20px;
+        min-width: 0;
+    }
+
+    div.page-wrapper .related-page-list {
+        order: 1;
+        flex-shrink: 0;
+        margin-top: 0px;
+        background-color: var(--related-page-list-bg);
+    }
+
+    div.page-wrapper .related-page-list .grid li {
+        margin-bottom: 2px !important;
+        margin-right: 2px !important;
+    }
+
+    div.page-wrapper .related-page-list .grid .splitter {
+        height: 15px !important;
+    }
+}
+
+/* 本文の間に .related-page-list の line 要素が反応してしまっていたのでオフにする */
+div.page-wrapper .related-page-list .grid-style-item .content .description .line {
+    pointer-events: none !important;
+}
+
+@media (min-width: 768px) {
+    .related-page-list span.kamon::before {
+        /* 鎖マークの大きさ */
+        font-size: 14px;
+    }
+
+    div.related-page-list .grid li.relation-label {
+        /* ラベルサイズ変更 */
+        height: auto;
+        margin-bottom: 2px;
+    }
+
+    div.related-page-list .grid li.relation-label {
+        /* ラベルサイズ変更 */
+        height: auto;
+        margin-bottom: 2px;
+    }
+
+    div.related-page-list .grid li.relation-label .arrow {
+        display: none;
+    }
+
+    .related-page-list li.relation-label a {
+        /* 関連リンク ラベル */
+        display: flex !important;
+        padding: 0 !important;
+    }
+
+    .related-page-list li.relation-label a {
+        /* 関連リンク ラベル・カード（共通） */
+        border-radius: 0;
+    }
+
+    .related-page-list ul.grid:hover li.relation-label a,
+    .related-page-list div.links-2-hop ul.grid:hover li.relation-label a {
+        /* 関連リンク ラベル・カード（共通、ホバー時） */
+        transition: 0s;
+    }
+
+    .related-page-list li.relation-label a:hover {
+        /* 関連リンク ラベル（ホバー時） */
+        filter: brightness(80%);
+    }
+
+    .related-page-list li.relation-label a span.title {
+        /* リンクのタイトル文字がある空間（共通） */
+        border-top: 0;
+        width: 100%;
+        padding: 7px 3px;
+        margin-left: 42px;
+        text-align: left;
+    }
+
+    .related-page-list li.relation-label a span.title {
+        /* リンクのタイトル文字がある空間（ラベル） */
+        padding: 0 3px;
+    }
+
+    .related-page-list li.relation-label a span.title {
+        /* リンクのタイトル文字（共通） */
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .related-page-list li.relation-label a:hover span.title {
+        /* リンクのタイトル文字（共通、ホバー時） */
+        transition: 0s;
+    }
+
+    .related-page-list li.relation-label a span.kamon.icon-lg {
+        /* リンクのアイコン */
+        display: flex;
+        position: absolute;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 100%;
+        margin: 0;
+        margin-left: 6px;
+        padding: 0;
+    }
+}
+
+@media (min-width: 768px) {
+    .related-page-list div.links-2-hop ul.grid li.relation-label a {
+        /* 関連リンク 2 hops link ラベル */
+        background-color: #333;
+    }
+
+    .related-page-list div.links-2-hop ul.grid:hover li.relation-label a {
+        /* 関連リンク 2 hops link ラベル（ホバー時） */
+        background-color: #666;
+    }
+}
