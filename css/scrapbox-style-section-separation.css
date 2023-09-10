@@ -1,0 +1,48 @@
+/**
+ * ref: <https://scrapbox.io/rebuild-kitashirakawa/セクション表示系>
+ */
+
+.app:not(.presentation) .line.section-title:not(.line-title) {
+    position: relative;
+}
+
+.app:not(.presentation) .line.section-title:not(.line-title) .text {
+    padding-top: 1em;
+}
+
+.app:not(.presentation) .line.section-title:not(.line-title):before {
+    content: "";
+    display: block;
+    width: 111%;
+    position: absolute;
+    left: -49px;
+    border: 1px lightgray solid;
+    height: 0.1px;
+}
+
+.app {
+    counter-reset: section;
+}
+
+.app:not(.presentation) .line.section-title:not(.line-title) {
+    position: relative;
+}
+
+.app:not(.presentation) .line.section-title:not(.line-title):after {
+    z-index: 500;
+    /* テロメアよりは上/ヘッダよりは下 適宜二分探索してくれ……。 */
+    counter-increment: section;
+    content: counter(section);
+    display: inline-block;
+    width: 1.6em;
+    height: 1.6em;
+    position: absolute;
+    top: -10px;
+    left: -55px;
+    background-color: #52ba68;
+    border-radius: 50%;
+    color: #fff;
+    font: 600 normal 90%/1.6 'Century Gothic', Arial, sans-serif;
+    text-align: center;
+    white-space: nowrap
+}

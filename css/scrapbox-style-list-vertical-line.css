@@ -1,0 +1,32 @@
+.indent-mark {
+    height: 100% !important;
+}
+
+.indent-mark .pad {
+    height: 100% !important;
+    overflow: unset !important;
+}
+
+.indent-mark span:nth-child(6n+1):not(:nth-last-child(1)):not(:nth-last-child(2)) .pad {
+    border-right: 2px solid rgb(251, 224, 155, 0.2);
+}
+
+.indent-mark span:nth-child(6n+2):not(:nth-last-child(1)):not(:nth-last-child(2)) .pad {
+    border-right: 2px solid rgb(239, 167, 177, 0.2);
+}
+
+.indent-mark span:nth-child(6n+3):not(:nth-last-child(1)):not(:nth-last-child(2)) .pad {
+    border-right: 2px solid rgb(234, 172, 216, 0.2);
+}
+
+.indent-mark span:nth-child(6n+4):not(:nth-last-child(1)):not(:nth-last-child(2)) .pad {
+    border-right: 2px solid rgb(174, 196, 232, 0.2);
+}
+
+.indent-mark span:nth-child(6n+5):not(:nth-last-child(1)):not(:nth-last-child(2)) .pad {
+    border-right: 2px solid rgb(151, 255, 243, 0.2);
+}
+
+.indent-mark span:nth-child(6n+6):not(:nth-last-child(1)):not(:nth-last-child(2)) .pad {
+    border-right: 2px solid rgb(203, 203, 203, 0.2);
+}

@@ -1,0 +1,17 @@
+.page-list-item.pin+.page-list-item:not(.pin) {
+    clear: both;
+}
+
+.grid li.page-list-item a .pin {
+    background-color: transparent;
+    background-image: none
+}
+
+.grid li.page-list-item a .pin::after {
+    background-image: url("https://i.gyazo.com/921d831e21e3e6f63f4b00750e300333.png");
+    background-size: 20px 20px;
+    display: inline-block;
+    content: "";
+    width: 20px;
+    height: 20px;
+}
