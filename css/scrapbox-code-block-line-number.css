@@ -1,0 +1,33 @@
+/**
+ *
+ * ref: <https://scrapbox.io/takker/コードブロック記法に行番号を表示するUserCSS>
+ *
+ */
+
+html[data-project-theme="defaut-dark"] {
+    --code-line-number-color: #D181FF;
+}
+
+.section-title,
+.code-block-start {
+    counter-reset: codeline
+}
+
+.code-block .indent-mark>span.char-index:last-child {
+    counter-increment: codeline
+}
+
+body:not(.presentation) .code-block .indent-mark>span.char-index:last-child::before {
+    content: counter(codeline);
+    position: absolute;
+}
+
+.code-block .indent-mark>span.char-index:last-child::before {
+    color: var(--code-line-number-color, #4f4f4f);
+}
+
+/* カーソル選択時の行番号の色 */
+.cursor-line .code-block .indent-mark>span.char-index:last-child::before {
+    color: var(--cursor-code-line-number-color, #FF00F0);
+    font-weight: bolder;
+}
