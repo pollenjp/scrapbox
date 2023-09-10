@@ -1,40 +1,81 @@
+/**
+ *
+ * ref: <https://scrapbox.io/Mijinko/関連ページ一覧をページの横に表示するUserCSS(最小版)>
+ *
+ */
+
+/**
+ *
+ * 全サイズ共通
+ *
+ */
+
+.page:is(div, main) {
+    /* ページ本体（下に余白を作ってスクロールしやすくする） */
+    margin-bottom: calc(100vh - 200px);
+}
+
+div.page-wrapper .related-page-list:is(div, section) .grid-style-item .content .description .line {
+    /**
+     * 本文の間に .related-page-list:is(div, section) の line 要素が反応してしまっていたのでオフにする
+     */
+    pointer-events: none !important;
+}
+
+
+/**
+ *
+ * width が 768px, 1000px, 1240px の違いによって変更する箇所
+ *
+ */
+
 @media (min-width: 768px) {
-    div.page-wrapper .related-page-list {
+    div.page-wrapper .related-page-list:is(div, section) {
         flex-basis: 100px !important;
     }
 
-    div.page-wrapper .related-page-list .relation-label {
+    div.page-wrapper .related-page-list:is(div, section) .relation-label {
         width: 100px !important;
     }
 }
 
 @media (min-width: 1000px) {
-    div.page-wrapper .related-page-list {
+    div.page-wrapper .related-page-list:is(div, section) {
         flex-basis: 200px !important;
     }
 
-    div.page-wrapper .related-page-list .relation-label {
+    div.page-wrapper .related-page-list:is(div, section) .relation-label {
         width: 200px !important;
     }
 
-    div.page-wrapper .related-page-list .grid li {
+    div.page-wrapper .related-page-list:is(div, section) .grid li {
         width: 100px;
     }
 }
 
 @media (min-width: 1240px) {
-    div.page-wrapper .related-page-list {
+    div.page-wrapper .related-page-list:is(div, section) {
         flex-basis: 300px !important;
     }
 
-    div.page-wrapper .related-page-list .relation-label {
+    div.page-wrapper .related-page-list:is(div, section) .relation-label {
         width: 300px !important;
     }
 
-    div.page-wrapper .related-page-list .grid li {
+    div.page-wrapper .related-page-list:is(div, section) .grid li {
         width: 100px;
     }
 }
+
+
+
+/**
+ *
+ * width が 768px ある場合
+ *
+ * 
+ *
+ */
 
 @media (min-width: 768px) {
     div.page-wrapper {
@@ -49,73 +90,103 @@
         min-width: 0;
     }
 
-    div.page-wrapper .related-page-list {
+    div.page-wrapper .related-page-list:is(div, section) {
         order: 1;
         flex-shrink: 0;
         margin-top: 0px;
         background-color: var(--related-page-list-bg);
     }
 
-    div.page-wrapper .related-page-list .grid li {
+    div.page-wrapper .related-page-list:is(div, section) .grid li {
         margin-bottom: 2px !important;
         margin-right: 2px !important;
     }
 
-    div.page-wrapper .related-page-list .grid .splitter {
+    div.page-wrapper .related-page-list:is(div, section) .grid .splitter {
         height: 15px !important;
     }
+
+    /**
+     *
+     * toolbar
+     *
+     */
+
+    .related-page-list:is(div, section) div.toolbar {
+        /* 関連ページリストのツールバー */
+        flex-direction: column;
+        align-items: flex-end;
+        height: auto;
+    }
+
+    .related-page-list:is(div, section) div.toolbar .related-page-list-search {
+        /* 関連ページリストの検索ボックス */
+        flex-direction: row;
+        display: flex;
+        vertical-align: middle;
+        width: 100%;
+    }
+
+    .related-page-list:is(div, section) div.toolbar .related-page-list-search>.fa {
+        /* 検索アイコン */
+        vertical-align: middle;
+        height: fit-content;
+        margin: auto 1px;
+    }
+
+    .related-page-list:is(div, section) div.toolbar .related-page-list-search input {
+        /* 検索ボックスの入力欄の大きさを抑える */
+        max-width: 180px;
+    }
+
 }
 
-/* 本文の間に .related-page-list の line 要素が反応してしまっていたのでオフにする */
-div.page-wrapper .related-page-list .grid-style-item .content .description .line {
-    pointer-events: none !important;
-}
+
+/**
+ *
+ * .relation-label は .related-page-list:is(div, section) の境目にあるやつ
+ *
+ */
 
 @media (min-width: 768px) {
-    .related-page-list span.kamon::before {
+    .related-page-list:is(div, section) span.kamon::before {
         /* 鎖マークの大きさ */
         font-size: 14px;
     }
 
-    div.related-page-list .grid li.relation-label {
+    .related-page-list:is(div, section) .grid li.relation-label {
         /* ラベルサイズ変更 */
-        height: auto;
+        height: 25px;
         margin-bottom: 2px;
     }
 
-    div.related-page-list .grid li.relation-label {
-        /* ラベルサイズ変更 */
-        height: auto;
-        margin-bottom: 2px;
-    }
-
-    div.related-page-list .grid li.relation-label .arrow {
+    .related-page-list:is(div, section) .grid li.relation-label .arrow {
         display: none;
     }
 
-    .related-page-list li.relation-label a {
+    .related-page-list:is(div, section) li.relation-label a {
         /* 関連リンク ラベル */
         display: flex !important;
         padding: 0 !important;
     }
 
-    .related-page-list li.relation-label a {
+    .related-page-list:is(div, section) li.relation-label a {
         /* 関連リンク ラベル・カード（共通） */
         border-radius: 0;
     }
 
-    .related-page-list ul.grid:hover li.relation-label a,
-    .related-page-list div.links-2-hop ul.grid:hover li.relation-label a {
+    .related-page-list:is(div, section) ul.grid:hover li.relation-label a,
+    .related-page-list:is(div, section) div.links-2-hop ul.grid:hover li.relation-label a {
         /* 関連リンク ラベル・カード（共通、ホバー時） */
         transition: 0s;
     }
 
-    .related-page-list li.relation-label a:hover {
+    .related-page-list:is(div, section) li.relation-label a:hover {
         /* 関連リンク ラベル（ホバー時） */
         filter: brightness(80%);
     }
 
-    .related-page-list li.relation-label a span.title {
+    .related-page-list:is(div, section) li.relation-label a span.title {
         /* リンクのタイトル文字がある空間（共通） */
         border-top: 0;
         width: 100%;
@@ -124,23 +195,23 @@ div.page-wrapper .related-page-list .grid-style-item .content .description .line
         text-align: left;
     }
 
-    .related-page-list li.relation-label a span.title {
+    .related-page-list:is(div, section) li.relation-label a span.title {
         /* リンクのタイトル文字がある空間（ラベル） */
         padding: 0 3px;
     }
 
-    .related-page-list li.relation-label a span.title {
+    .related-page-list:is(div, section) li.relation-label a span.title {
         /* リンクのタイトル文字（共通） */
         font-size: 14px;
         font-weight: bold;
     }
 
-    .related-page-list li.relation-label a:hover span.title {
+    .related-page-list:is(div, section) li.relation-label a:hover span.title {
         /* リンクのタイトル文字（共通、ホバー時） */
         transition: 0s;
     }
 
-    .related-page-list li.relation-label a span.kamon.icon-lg {
+    .related-page-list:is(div, section) li.relation-label a span.kamon.icon-lg {
         /* リンクのアイコン */
         display: flex;
         position: absolute;
@@ -155,12 +226,12 @@ div.page-wrapper .related-page-list .grid-style-item .content .description .line
 }
 
 @media (min-width: 768px) {
-    .related-page-list div.links-2-hop ul.grid li.relation-label a {
+    .related-page-list:is(div, section) div.links-2-hop ul.grid li.relation-label a {
         /* 関連リンク 2 hops link ラベル */
         background-color: #333;
     }
 
-    .related-page-list div.links-2-hop ul.grid:hover li.relation-label a {
+    .related-page-list:is(div, section) div.links-2-hop ul.grid:hover li.relation-label a {
         /* 関連リンク 2 hops link ラベル（ホバー時） */
         background-color: #666;
     }
