@@ -1,3 +1,9 @@
+/**
+ *
+ * ref: <https://scrapbox.io/villagepump/borderでインデントに縦線を表示するUserCSS>
+ *
+ */
+
 .indent-mark {
     height: 100% !important;
 }
