@@ -1,9 +1,14 @@
 # bookmarklet
 
+## requirements
+
+- `nvm install --lts`
+- `make install`
+
 ## build
 
 ```sh
-make build && make parse
+make build
 ```
 
 ## TypeScript support

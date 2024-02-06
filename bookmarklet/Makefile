@@ -11,6 +11,7 @@ install:
 build: ## build js from typescript file
 	${MAKE} clean
 	npx tsc
+	${MAKE} parse
 
 .PHONY: parse
 parse: ## parse built js file into bookmarklet

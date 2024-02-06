@@ -91,7 +91,10 @@ function getChildElementByTagName(element, tagName) {
             return elem;
         }
     }
+    console.log("==== element ===");
     console.log(element);
+    console.log("==== element.children ===");
+    console.log(element.children);
     throw new Error(`Element not found: ${tagName} ${element}`);
 }
 function getChildElementByTagNameAndId(element, tagName, id) {
@@ -560,22 +563,22 @@ class YouTubeComPageParser extends PageParser {
             element = getChildElementByTagNameAndClass(element, "div", [
                 "immersive-header-container",
                 "style-scope",
-                "ytd-playlist-header-renderer",
+                "ytd-playlist-header-renderer"
             ]);
             element = getChildElementByTagNameAndClass(element, "div", [
                 "immersive-header-content",
                 "style-scope",
-                "ytd-playlist-header-renderer",
+                "ytd-playlist-header-renderer"
             ]);
             element = getChildElementByTagNameAndClass(element, "div", [
                 "thumbnail-and-metadata-wrapper",
                 "style-scope",
-                "ytd-playlist-header-renderer",
+                "ytd-playlist-header-renderer"
             ]);
             element = getChildElementByTagNameAndClass(element, "div", [
                 "metadata-wrapper",
                 "style-scope",
-                "ytd-playlist-header-renderer",
+                "ytd-playlist-header-renderer"
             ]);
             element = getChildElementByTagName(element, "yt-dynamic-sizing-formatted-string");
             element = getChildElementByTagNameAndId(element, "div", "container");
@@ -598,37 +601,37 @@ class YouTubeComPageParser extends PageParser {
             element = getChildElementByTagNameAndClass(element, "div", [
                 "immersive-header-container",
                 "style-scope",
-                "ytd-playlist-header-renderer",
+                "ytd-playlist-header-renderer"
             ]);
             element = getChildElementByTagNameAndClass(element, "div", [
                 "immersive-header-content",
                 "style-scope",
-                "ytd-playlist-header-renderer",
+                "ytd-playlist-header-renderer"
             ]);
             element = getChildElementByTagNameAndClass(element, "div", [
                 "thumbnail-and-metadata-wrapper",
                 "style-scope",
-                "ytd-playlist-header-renderer",
+                "ytd-playlist-header-renderer"
             ]);
             element = getChildElementByTagNameAndClass(element, "div", [
                 "metadata-wrapper",
                 "style-scope",
-                "ytd-playlist-header-renderer",
+                "ytd-playlist-header-renderer"
             ]);
             element = getChildElementByTagNameAndClass(element, "div", [
                 "metadata-action-bar",
                 "style-scope",
-                "ytd-playlist-header-renderer",
+                "ytd-playlist-header-renderer"
             ]);
             element = getChildElementByTagNameAndClass(element, "div", [
                 "metadata-text-wrapper",
                 "style-scope",
-                "ytd-playlist-header-renderer",
+                "ytd-playlist-header-renderer"
             ]);
             element = getChildElementByTagNameAndClass(element, "div", [
                 "metadata-owner",
                 "style-scope",
-                "ytd-playlist-header-renderer",
+                "ytd-playlist-header-renderer"
             ]);
             element = getChildElementByTagNameAndId(element, "yt-formatted-string", "owner-text");
             element = getChildElementByTagName(element, "a");
@@ -673,11 +676,12 @@ class YouTubeComPageParser extends PageParser {
             element = getChildElementByTagNameAndClass(element, "div", [
                 "overlay",
                 "style-scope",
-                "ytd-reel-video-renderer",
+                "ytd-reel-video-renderer"
             ]);
             element = getChildElementByTagName(element, "ytd-reel-player-overlay-renderer");
+            element = getChildElementByTagNameAndClass(element, "div", ["metadata-container"]);
             element = getChildElementByTagNameAndId(element, "div", "overlay");
-            element = getChildElementByTagName(element, "ytd-reel-player-header-renderer");
+            element = getChildElementByTagName(element, "reel-player-header-renderer");
             element = getChildElementByTagNameAndId(element, "div", "channel-container");
             element = getChildElementByTagNameAndId(element, "div", "channel-info");
             element = getChildElementByTagName(element, "ytd-channel-name");
@@ -722,7 +726,7 @@ class YouTubeComPageParser extends PageParser {
         return {
             channelName: channelName,
             channelId: channelId,
-            channelUrl: new URL(`${this._url.origin}/${channelId}`),
+            channelUrl: new URL(`${this._url.origin}/${channelId}`)
         };
     }
     /**
