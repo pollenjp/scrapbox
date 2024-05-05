@@ -5,7 +5,7 @@ export
 
 .PHONY: install
 install:
-	npm install
+	npx npm install
 
 .PHONY: build
 build: ## build js from typescript file
