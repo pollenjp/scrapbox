@@ -715,13 +715,10 @@ class YouTubeComPageParser extends PageParser {
      * @returns {{channelName: string, channelId: string, channelUrl: URL}}
      */
     getChannelInfoAtUserPage() {
-        var _a, _b, _c, _d, _e, _f, _g;
-        const elem = (_g = (_f = (_e = (_d = (_c = (_b = (_a = this._document
-            .getElementById("channel-container")) === null || _a === void 0 ? void 0 : _a.querySelector("#channel-header")) === null || _b === void 0 ? void 0 : _b.querySelector("#channel-header-container")) === null || _c === void 0 ? void 0 : _c.querySelector("#inner-header-container")) === null || _d === void 0 ? void 0 : _d.querySelector("#meta")) === null || _e === void 0 ? void 0 : _e.querySelector("#container")) === null || _f === void 0 ? void 0 : _f.querySelector("#text-container")) === null || _g === void 0 ? void 0 : _g.querySelector("#text");
-        if (elem === null || elem === undefined) {
-            throw new Error("Failed to get channel name.");
-        }
-        const channelName = elem.innerHTML;
+        var _a, _b, _c, _d;
+        const headerElem = (_b = (_a = this._document
+            .getElementById("page-header")) === null || _a === void 0 ? void 0 : _a.querySelector(".page-header-view-model-wiz__page-header-headline-info")) !== null && _b !== void 0 ? _b : (() => { throw new Error("Failed to get header channel elem."); })();
+        const channelName = (_d = (_c = getChildElementByTagName(getChildElementByTagName(headerElem, "yt-dynamic-text-view-model"), "h1")) === null || _c === void 0 ? void 0 : _c.textContent) !== null && _d !== void 0 ? _d : (() => { throw new Error("Failed to get channel name."); })();
         const channelId = this._urlPathList[0];
         return {
             channelName: channelName,
@@ -747,15 +744,12 @@ class YouTubeComPageParser extends PageParser {
      */
     postAtUserPage() {
         /* Image URL */
-        var _a, _b, _c, _d, _e;
-        const elem = (_e = (_d = (_c = (_b = (_a = this._document) === null || _a === void 0 ? void 0 : _a.getElementById("channel-container")) === null || _b === void 0 ? void 0 : _b.querySelector("#channel-header")) === null || _c === void 0 ? void 0 : _c.querySelector("#channel-header-container")) === null || _d === void 0 ? void 0 : _d.querySelector("#avatar")) === null || _e === void 0 ? void 0 : _e.querySelector("#img");
-        if (elem === null || elem === undefined) {
-            throw new Error("Failed to get avatar image.");
-        }
-        if (!(elem instanceof HTMLImageElement)) {
+        var _a, _b, _c, _d;
+        const headerAvatarElem = (_d = (_c = (_b = (_a = this._document) === null || _a === void 0 ? void 0 : _a.getElementById("page-header")) === null || _b === void 0 ? void 0 : _b.querySelector(".page-header-view-model-wiz__page-header-headline-image")) === null || _c === void 0 ? void 0 : _c.querySelector(".yt-core-image")) !== null && _d !== void 0 ? _d : (() => { throw new Error("Failed to get avatar image."); })();
+        if (!(headerAvatarElem instanceof HTMLImageElement)) {
             throw new Error(`Failed to get avatar image. the element is not HTMLImageElement.`);
         }
-        const imageUrl = new URL(elem.src);
+        const imageUrl = new URL(headerAvatarElem.src);
         this._body.push(`[${imageUrl.toString()}#.jpg]`);
     }
     /**

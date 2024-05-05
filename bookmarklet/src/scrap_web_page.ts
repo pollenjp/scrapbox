@@ -866,19 +866,13 @@ class YouTubeComPageParser extends PageParser {
    * @returns {{channelName: string, channelId: string, channelUrl: URL}}
    */
   getChannelInfoAtUserPage() {
-    const elem = this._document
-      .getElementById("channel-container")
-      ?.querySelector("#channel-header")
-      ?.querySelector("#channel-header-container")
-      ?.querySelector("#inner-header-container")
-      ?.querySelector("#meta")
-      ?.querySelector("#container")
-      ?.querySelector("#text-container")
-      ?.querySelector("#text")
-    if (elem === null || elem === undefined) {
-      throw new Error("Failed to get channel name.")
-    }
-    const channelName = elem.innerHTML
+    const headerElem = this._document
+      .getElementById("page-header")
+      ?.querySelector(".page-header-view-model-wiz__page-header-headline-info") ?? (() => {throw new Error("Failed to get header channel elem.")})();
+    const channelName =
+      getChildElementByTagName(
+        getChildElementByTagName(headerElem, "yt-dynamic-text-view-model"), "h1")
+        ?.textContent ?? (() => {throw new Error("Failed to get channel name.")})();
     const channelId = this._urlPathList[0]
     return {
       channelName: channelName,
@@ -910,19 +904,14 @@ class YouTubeComPageParser extends PageParser {
   postAtUserPage() {
     /* Image URL */
 
-    const elem = this._document
-      ?.getElementById("channel-container")
-      ?.querySelector("#channel-header")
-      ?.querySelector("#channel-header-container")
-      ?.querySelector("#avatar")
-      ?.querySelector("#img")
-    if (elem === null || elem === undefined) {
-      throw new Error("Failed to get avatar image.")
-    }
-    if (!(elem instanceof HTMLImageElement)) {
+    const headerAvatarElem = this._document
+      ?.getElementById("page-header")
+      ?.querySelector(".page-header-view-model-wiz__page-header-headline-image")
+      ?.querySelector(".yt-core-image") ?? (() => {throw new Error("Failed to get avatar image.")})();
+    if (!(headerAvatarElem instanceof HTMLImageElement)) {
       throw new Error(`Failed to get avatar image. the element is not HTMLImageElement.`)
     }
-    const imageUrl = new URL(elem.src)
+    const imageUrl = new URL(headerAvatarElem.src)
 
     this._body.push(`[${imageUrl.toString()}#.jpg]`)
   }
