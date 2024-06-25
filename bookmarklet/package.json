@@ -4,6 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "clean": "rimraf build dist",
+    "lint": "eslint --fix --no-error-on-unmatched-pattern src/ test/",
+    "start": "npx npm run build && npm run serve",
+    "format": "prettier-eslint --write \"src/**/*.{ts,js}\"",
+    "build": "npx npm run clean && npx tsc",
+    "serve": "node dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,6 +21,7 @@
     "eslint": "^8.39.0",
     "eslint-config-prettier": "^8.8.0",
     "prettier": "^2.8.7",
+    "prettier-eslint-cli": "^8.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   }

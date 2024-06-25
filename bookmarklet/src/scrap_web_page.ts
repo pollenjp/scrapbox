@@ -282,7 +282,7 @@ class PageParser {
     /* 空白行 (null) の削除 */
 
     for (let i = 0; i < quoteLines.length; ++i) {
-      quoteLines.forEach((line, i) => {
+      quoteLines.forEach((line) => {
         if (line !== null) {
           this._body.push(line)
         }
@@ -866,14 +866,22 @@ class YouTubeComPageParser extends PageParser {
    * @returns {{channelName: string, channelId: string, channelUrl: URL}}
    */
   getChannelInfoAtUserPage() {
-    const headerElem = this._document
-      .getElementById("page-header")
-      ?.querySelector(".page-header-view-model-wiz__page-header-headline-info") ?? (() => {throw new Error("Failed to get header channel elem.")})();
+    const headerElem =
+      this._document
+        .getElementById("page-header")
+        ?.querySelector(".page-header-view-model-wiz__page-header-headline-info") ??
+      (() => {
+        throw new Error("Failed to get header channel elem.")
+      })()
     const channelName =
       getChildElementByTagName(
-        getChildElementByTagName(headerElem, "yt-dynamic-text-view-model"), "h1")
-        ?.textContent ?? (() => {throw new Error("Failed to get channel name.")})();
-    const channelId = this._urlPathList[0]
+        getChildElementByTagName(headerElem, "yt-dynamic-text-view-model"),
+        "h1"
+      )?.textContent ??
+      (() => {
+        throw new Error("Failed to get channel name.")
+      })()
+    const channelId = this._document.getElementById("channel-handle")
     return {
       channelName: channelName,
       channelId: channelId,
@@ -904,10 +912,14 @@ class YouTubeComPageParser extends PageParser {
   postAtUserPage() {
     /* Image URL */
 
-    const headerAvatarElem = this._document
-      ?.getElementById("page-header")
-      ?.querySelector(".page-header-view-model-wiz__page-header-headline-image")
-      ?.querySelector(".yt-core-image") ?? (() => {throw new Error("Failed to get avatar image.")})();
+    const headerAvatarElem =
+      this._document
+        ?.getElementById("page-header")
+        ?.querySelector(".page-header-view-model-wiz__page-header-headline-image")
+        ?.querySelector(".yt-core-image") ??
+      (() => {
+        throw new Error("Failed to get avatar image.")
+      })()
     if (!(headerAvatarElem instanceof HTMLImageElement)) {
       throw new Error(`Failed to get avatar image. the element is not HTMLImageElement.`)
     }
