@@ -9,8 +9,8 @@ install:
 
 .PHONY: build
 build: ## build js from typescript file
-	${MAKE} clean
-	npx tsc
+	npx npm run build
+	./minify.sh
 	${MAKE} parse
 
 .PHONY: parse
@@ -18,10 +18,6 @@ parse: ## parse built js file into bookmarklet
 	@echo 'javascript: (function () {' > "js/scrap_web_page.js"
 	@cat "build/scrap_web_page.js" >> "js/scrap_web_page.js"
 	@echo '})();' >> "js/scrap_web_page.js"
-
-.PHONY: clean
-clean:
-	-rm -rf "build"
 
 .PHONY: help
 help:  ## show help

@@ -106,19 +106,47 @@ function getChildElementByTagName(element: Element, tagName: string): Element {
   throw new Error(`Element not found: ${tagName} ${element}`)
 }
 
-function getChildElementByTagNameAndId(element: Element, tagName: string, id: string): Element {
-  tagName = tagName.toUpperCase()
+type GetChildElementByTagNameAndIdParams = {
+  tagName: string
+  id: string
+}
 
-  for (const elem of element.children) {
+interface Element {
+  getChildElementByTagNameAndId(params: GetChildElementByTagNameAndIdParams): Element
+}
+
+Element.prototype.getChildElementByTagNameAndId = function (params) {
+  const tagName = params.tagName.toUpperCase()
+  for (const elem of this.children) {
     if (elem.tagName !== tagName) {
       continue
     }
-    if (elem.id === id) {
+    if (elem.id === params.id) {
       return elem
     }
   }
-  console.log(element)
-  throw new Error(`Element not found: ${tagName} ${id} ${element}`)
+  console.log(this)
+  throw new Error(`Element not found: ${tagName} ${params.id} ${this}`)
+}
+
+type GetChildElementByTagNameAndIdParamsv1 = {
+  element: Element
+  tagName: string
+  id: string
+}
+
+function getChildElementByTagNameAndId(params: GetChildElementByTagNameAndIdParamsv1): Element {
+  const tagName = params.tagName.toUpperCase()
+  for (const elem of params.element.children) {
+    if (elem.tagName !== tagName) {
+      continue
+    }
+    if (elem.id === params.id) {
+      return elem
+    }
+  }
+  console.log(params.element)
+  throw new Error(`Element not found: ${tagName} ${params.id} ${params.element}`)
 }
 
 function getChildElementByTagNameAndClass(
@@ -679,7 +707,11 @@ class YouTubeComPageParser extends PageParser {
       let element = root
       element = getChildElementByTagName(element, "body")
       element = getChildElementByTagName(element, "ytd-app")
-      element = getChildElementByTagNameAndId(element, "div", "content")
+      element = getChildElementByTagNameAndId({
+        element: element,
+        tagName: "div",
+        id: "content"
+      })
       element = getChildElementByTagName(element, "ytd-page-manager")
       element = getChildElementByTagName(element, "ytd-browse")
       element = getChildElementByTagName(element, "ytd-playlist-header-renderer")
@@ -704,8 +736,16 @@ class YouTubeComPageParser extends PageParser {
         "ytd-playlist-header-renderer"
       ])
       element = getChildElementByTagName(element, "yt-dynamic-sizing-formatted-string")
-      element = getChildElementByTagNameAndId(element, "div", "container")
-      element = getChildElementByTagNameAndId(element, "yt-formatted-string", "text")
+      element = getChildElementByTagNameAndId({
+        element: element,
+        tagName: "div",
+        id: "container"
+      })
+      element = getChildElementByTagNameAndId({
+        element: element,
+        tagName: "yt-formatted-string",
+        id: "text"
+      })
       console.log(element)
       if (element instanceof HTMLElement) {
         return element.innerText
@@ -724,7 +764,11 @@ class YouTubeComPageParser extends PageParser {
       let element = root
       element = getChildElementByTagName(element, "body")
       element = getChildElementByTagName(element, "ytd-app")
-      element = getChildElementByTagNameAndId(element, "div", "content")
+      element = getChildElementByTagNameAndId({
+        element: element,
+        tagName: "div",
+        id: "content"
+      })
       element = getChildElementByTagName(element, "ytd-page-manager")
       element = getChildElementByTagName(element, "ytd-browse")
       element = getChildElementByTagName(element, "ytd-playlist-header-renderer")
@@ -763,7 +807,11 @@ class YouTubeComPageParser extends PageParser {
         "style-scope",
         "ytd-playlist-header-renderer"
       ])
-      element = getChildElementByTagNameAndId(element, "yt-formatted-string", "owner-text")
+      element = getChildElementByTagNameAndId({
+        element: element,
+        tagName: "yt-formatted-string",
+        id: "owner-text"
+      })
       element = getChildElementByTagName(element, "a")
       if (!(element instanceof HTMLAnchorElement)) {
         throw new Error(
@@ -808,8 +856,16 @@ class YouTubeComPageParser extends PageParser {
         throw new Error("'page-manager' id is not found")
       }
       let element = getChildElementByTagName(elem, "ytd-shorts")
-      element = getChildElementByTagNameAndId(element, "div", "shorts-container")
-      element = getChildElementByTagNameAndId(element, "div", "shorts-inner-container")
+      element = getChildElementByTagNameAndId({
+        element: element,
+        tagName: "div",
+        id: "shorts-container"
+      })
+      element = getChildElementByTagNameAndId({
+        element: element,
+        tagName: "div",
+        id: "shorts-inner-container"
+      })
       /* get element having `is-active` option */
       element = getChildElementByTagNameAndAttribute(
         element,
@@ -823,14 +879,38 @@ class YouTubeComPageParser extends PageParser {
       ])
       element = getChildElementByTagName(element, "ytd-reel-player-overlay-renderer")
       element = getChildElementByTagNameAndClass(element, "div", ["metadata-container"])
-      element = getChildElementByTagNameAndId(element, "div", "overlay")
+      element = getChildElementByTagNameAndId({
+        element: element,
+        tagName: "div",
+        id: "overlay"
+      })
       element = getChildElementByTagName(element, "reel-player-header-renderer")
-      element = getChildElementByTagNameAndId(element, "div", "channel-container")
-      element = getChildElementByTagNameAndId(element, "div", "channel-info")
+      element = getChildElementByTagNameAndId({
+        element: element,
+        tagName: "div",
+        id: "channel-container"
+      })
+      element = getChildElementByTagNameAndId({
+        element: element,
+        tagName: "div",
+        id: "channel-info"
+      })
       element = getChildElementByTagName(element, "ytd-channel-name")
-      element = getChildElementByTagNameAndId(element, "div", "container")
-      element = getChildElementByTagNameAndId(element, "div", "text-container")
-      element = getChildElementByTagNameAndId(element, "yt-formatted-string", "text")
+      element = getChildElementByTagNameAndId({
+        element: element,
+        tagName: "div",
+        id: "container"
+      })
+      element = getChildElementByTagNameAndId({
+        element: element,
+        tagName: "div",
+        id: "text-container"
+      })
+      element = getChildElementByTagNameAndId({
+        element: element,
+        tagName: "yt-formatted-string",
+        id: "text"
+      })
       element = getChildElementByTagName(element, "a")
       if (!(element instanceof HTMLAnchorElement)) {
         throw new Error(
@@ -866,27 +946,40 @@ class YouTubeComPageParser extends PageParser {
    * @returns {{channelName: string, channelId: string, channelUrl: URL}}
    */
   getChannelInfoAtUserPage() {
-    const headerElem =
-      this._document
-        .getElementById("page-header")
-        ?.querySelector(".page-header-view-model-wiz__page-header-headline-info") ??
-      (() => {
-        throw new Error("Failed to get header channel elem.")
-      })()
     const channelName =
-      getChildElementByTagName(
-        getChildElementByTagName(headerElem, "yt-dynamic-text-view-model"),
-        "h1"
-      )?.textContent ??
+      this._document
+        .getElementById("inner-header-container")
+        ?.getChildElementByTagNameAndId({ tagName: "div", id: "meta" })
+        .getChildElementByTagNameAndId({
+          tagName: "ytd-channel-name",
+          id: "channel-name"
+        })
+        .getChildElementByTagNameAndId({ tagName: "div", id: "container" })
+        .getChildElementByTagNameAndId({
+          tagName: "div",
+          id: "text-container"
+        })
+        .getChildElementByTagNameAndId({ tagName: "yt-formatted-string", id: "text" })
+        .textContent ??
       (() => {
         throw new Error("Failed to get channel name.")
       })()
-    const channelId = this._document.getElementById("channel-handle")
-    return {
+    const channelId =
+      this._document.getElementById("channel-handle")?.textContent ??
+      (() => {
+        throw new Error("Failed to get channel id.")
+      })()
+    type ChannelInfo = {
+      channelName: string
+      channelId: string
+      channelUrl: URL
+    }
+    const ret: ChannelInfo = {
       channelName: channelName,
       channelId: channelId,
       channelUrl: new URL(`${this._url.origin}/${channelId}`)
     }
+    return ret
   }
 
   /**
@@ -914,9 +1007,11 @@ class YouTubeComPageParser extends PageParser {
 
     const headerAvatarElem =
       this._document
-        ?.getElementById("page-header")
-        ?.querySelector(".page-header-view-model-wiz__page-header-headline-image")
-        ?.querySelector(".yt-core-image") ??
+        .getElementById("channel-container")
+        ?.getChildElementByTagNameAndId({ tagName: "div", id: "channel-header" })
+        .getChildElementByTagNameAndId({ tagName: "div", id: "channel-header-container" })
+        .getChildElementByTagNameAndId({ tagName: "yt-img-shadow", id: "avatar" })
+        .getChildElementByTagNameAndId({ tagName: "img", id: "img" }) ??
       (() => {
         throw new Error("Failed to get avatar image.")
       })()
