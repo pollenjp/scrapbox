@@ -7,6 +7,10 @@ export
 install:
 	npx npm install
 
+.PHONY: fmt
+fmt:
+	npx npm run format
+
 .PHONY: build
 build: ## build js from typescript file
 	npx npm run build

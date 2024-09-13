@@ -197,6 +197,18 @@ function getChildElementByTagNameAndAttribute(
   throw new Error(`Element not found: ${tagName} / ${attributeName} / ${element}`)
 }
 
+const getDeepTextContent = (element: HTMLElement): string => {
+  let text = ""
+  for (const child of element.childNodes) {
+    if (child.nodeType === Node.TEXT_NODE) {
+      text += child.textContent
+    } else if (child.nodeType === Node.ELEMENT_NODE) {
+      text += getDeepTextContent(child as HTMLElement)
+    }
+  }
+  return text.trim()
+}
+
 /* End Define Functions */
 
 /***************
@@ -228,7 +240,7 @@ class PageParser {
     this._title = title
     this._url = url
     this._document = document
-    this._urlPathList = splitUrlPath(this._url.pathname)
+    this._urlPathList = splitUrlPath(this._url.pathname).map((path) => decodeURIComponent(path))
   }
 
   do(): ParsedData {
@@ -573,7 +585,7 @@ class TwitterComPageParser extends PageParser {
     if (urlPathArray.length < 1) {
       alert(`Failed to get user from ${path}`)
     }
-    return urlPathArray[0]
+    return decodeURIComponent(urlPathArray[0])
   }
 }
 
@@ -672,10 +684,12 @@ class YouTubeComPageParser extends PageParser {
       channelUrl = new URL(elem[0].href)
     }
 
-    const channelId = splitUrlPath(channelUrl.pathname).at(-1)
-    if (channelId === undefined) {
-      throw new Error("Failed to get channel id")
-    }
+    const channelId = decodeURIComponent(
+      splitUrlPath(channelUrl.pathname).at(-1) ||
+        (() => {
+          throw new Error("Failed to get channel id")
+        })()
+    )
     const videoId = this.extractVideoIdFromVideoUrl(this._url)
     const ds = format(
       YouTubeComPageParser.extractVideoUploadDateFromVideoPage(document),
@@ -830,10 +844,12 @@ class YouTubeComPageParser extends PageParser {
       throw new Error("Failed to get playlist id.")
     }
 
-    const channelId = splitUrlPath(channelInfo.url.pathname).at(-1)
-    if (channelId === undefined) {
-      throw new Error("Failed to get channel id.")
-    }
+    const channelId = decodeURIComponent(
+      splitUrlPath(channelInfo.url.pathname).at(-1) ||
+        (() => {
+          throw new Error("Failed to get channel id")
+        })()
+    )
 
     this._title = `${playlistName} (playlist:${playlistId}) (${channelId})`
     this._body.push(`[${generateYouTubeUserPageTitle(channelId)}]`)
@@ -921,7 +937,12 @@ class YouTubeComPageParser extends PageParser {
     }
 
     const channelUrl = getChannelUrlAtShortsPage(this._document)
-    const channelId = splitUrlPath(channelUrl.pathname)[0]
+    const channelId = decodeURIComponent(
+      splitUrlPath(channelUrl.pathname).at(0) ||
+        (() => {
+          throw new Error("Failed to get channel id")
+        })()
+    )
 
     this._title = `${this._document.title}${returnTitlePathPart(this._url.pathname)}`
     this._body.push(`[${generateYouTubeUserPageTitle(channelId)}]`)
@@ -946,26 +967,21 @@ class YouTubeComPageParser extends PageParser {
    * @returns {{channelName: string, channelId: string, channelUrl: URL}}
    */
   getChannelInfoAtUserPage() {
-    const channelName =
-      this._document
-        .getElementById("inner-header-container")
-        ?.getChildElementByTagNameAndId({ tagName: "div", id: "meta" })
-        .getChildElementByTagNameAndId({
-          tagName: "ytd-channel-name",
-          id: "channel-name"
-        })
-        .getChildElementByTagNameAndId({ tagName: "div", id: "container" })
-        .getChildElementByTagNameAndId({
-          tagName: "div",
-          id: "text-container"
-        })
-        .getChildElementByTagNameAndId({ tagName: "yt-formatted-string", id: "text" })
-        .textContent ??
-      (() => {
-        throw new Error("Failed to get channel name.")
-      })()
+    const channelName = getDeepTextContent(
+      this._document.getElementsByClassName(
+        "page-header-view-model-wiz__page-header-title"
+      )[0] as HTMLElement
+    )
     const channelId =
-      this._document.getElementById("channel-handle")?.textContent ??
+      (
+        (
+          this._document.querySelector(
+            ".page-header-view-model-wiz__page-header-content-metadata"
+          ) as HTMLElement
+        ).querySelector(
+          "div.yt-content-metadata-view-model-wiz__metadata-row span.yt-core-attributed-string"
+        ) as HTMLElement
+      ).textContent ||
       (() => {
         throw new Error("Failed to get channel id.")
       })()
@@ -1006,12 +1022,7 @@ class YouTubeComPageParser extends PageParser {
     /* Image URL */
 
     const headerAvatarElem =
-      this._document
-        .getElementById("channel-container")
-        ?.getChildElementByTagNameAndId({ tagName: "div", id: "channel-header" })
-        .getChildElementByTagNameAndId({ tagName: "div", id: "channel-header-container" })
-        .getChildElementByTagNameAndId({ tagName: "yt-img-shadow", id: "avatar" })
-        .getChildElementByTagNameAndId({ tagName: "img", id: "img" }) ??
+      (this._document.querySelector("img.yt-spec-avatar-shape__image") as HTMLImageElement) ||
       (() => {
         throw new Error("Failed to get avatar image.")
       })()
