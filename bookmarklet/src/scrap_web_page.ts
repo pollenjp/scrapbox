@@ -599,7 +599,9 @@ class YouTubeComPageParser extends PageParser {
    */
   parsePreCustom() {
     switch (this._urlPathList[0]) {
-      case "watch": {
+      case "watch":
+      case "live": {
+        /* https://www.youtube.com/live/HilaOz31AfU */
         this.preAtVideoPage()
         return
       }
@@ -866,77 +868,13 @@ class YouTubeComPageParser extends PageParser {
    *
    */
   preAtShortsPage() {
-    function getChannelUrlAtShortsPage(document: Document): URL {
-      const elem = document.getElementById("page-manager")
-      if (elem === null) {
-        throw new Error("'page-manager' id is not found")
-      }
-      let element = getChildElementByTagName(elem, "ytd-shorts")
-      element = getChildElementByTagNameAndId({
-        element: element,
-        tagName: "div",
-        id: "shorts-container"
-      })
-      element = getChildElementByTagNameAndId({
-        element: element,
-        tagName: "div",
-        id: "shorts-inner-container"
-      })
-      /* get element having `is-active` option */
-      element = getChildElementByTagNameAndAttribute(
-        element,
-        "ytd-reel-video-renderer",
-        "is-active"
-      )
-      element = getChildElementByTagNameAndClass(element, "div", [
-        "overlay",
-        "style-scope",
-        "ytd-reel-video-renderer"
-      ])
-      element = getChildElementByTagName(element, "ytd-reel-player-overlay-renderer")
-      element = getChildElementByTagNameAndClass(element, "div", ["metadata-container"])
-      element = getChildElementByTagNameAndId({
-        element: element,
-        tagName: "div",
-        id: "overlay"
-      })
-      element = getChildElementByTagName(element, "reel-player-header-renderer")
-      element = getChildElementByTagNameAndId({
-        element: element,
-        tagName: "div",
-        id: "channel-container"
-      })
-      element = getChildElementByTagNameAndId({
-        element: element,
-        tagName: "div",
-        id: "channel-info"
-      })
-      element = getChildElementByTagName(element, "ytd-channel-name")
-      element = getChildElementByTagNameAndId({
-        element: element,
-        tagName: "div",
-        id: "container"
-      })
-      element = getChildElementByTagNameAndId({
-        element: element,
-        tagName: "div",
-        id: "text-container"
-      })
-      element = getChildElementByTagNameAndId({
-        element: element,
-        tagName: "yt-formatted-string",
-        id: "text"
-      })
-      element = getChildElementByTagName(element, "a")
-      if (!(element instanceof HTMLAnchorElement)) {
-        throw new Error(
-          `Failed to get channel url. the element is not HTMLAnchorElement. (${element})`
-        )
-      }
-      return new URL(element.href)
-    }
-
-    const channelUrl = getChannelUrlAtShortsPage(this._document)
+    const channelUrl = new URL(
+      (
+        this._document.getElementsByClassName(
+          "yt-core-attributed-string__link"
+        )[0] as HTMLAnchorElement
+      ).href
+    )
     const channelId = decodeURIComponent(
       splitUrlPath(channelUrl.pathname).at(0) ||
         (() => {
