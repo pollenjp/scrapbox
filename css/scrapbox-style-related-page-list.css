@@ -15,6 +15,16 @@
     margin-bottom: calc(100vh - 200px);
 }
 
+div.container div.page-column {
+    grid-template-columns: 5px minmax(98%, auto) min-content;
+}
+
+div.page-wrapper .related-page-list:is(div, section) ul.grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0px;
+}
+
 div.page-wrapper .related-page-list:is(div, section) .grid-style-item .content .description .line {
     /**
      * 本文の間に .related-page-list:is(div, section) の line 要素が反応してしまっていたのでオフにする
@@ -24,9 +34,9 @@ div.page-wrapper .related-page-list:is(div, section) .grid-style-item .content .
 
 
 /**
+ * .related-page-list の数を変更
  *
  * width が 768px, 1000px, 1240px の違いによって変更する箇所
- *
  */
 
 @media (min-width: 768px) {
@@ -41,29 +51,29 @@ div.page-wrapper .related-page-list:is(div, section) .grid-style-item .content .
 
 @media (min-width: 1000px) {
     div.page-wrapper .related-page-list:is(div, section) {
-        flex-basis: 200px !important;
+        flex-basis: calc(100px * 2) !important;
     }
 
     div.page-wrapper .related-page-list:is(div, section) .relation-label {
-        width: 200px !important;
+        width: calc(100px * 2) !important;
     }
 
-    div.page-wrapper .related-page-list:is(div, section) .grid li {
-        width: 100px;
+    div.page-wrapper .related-page-list:is(div, section) .grid li.page-list-item.grid-style-item {
+        width: calc(100px - 2px) !important;
     }
 }
 
 @media (min-width: 1240px) {
     div.page-wrapper .related-page-list:is(div, section) {
-        flex-basis: 300px !important;
+        flex-basis: calc(100px * 4) !important;
     }
 
     div.page-wrapper .related-page-list:is(div, section) .relation-label {
-        width: 300px !important;
+        width: calc(100px * 4) !important;
     }
 
-    div.page-wrapper .related-page-list:is(div, section) .grid li {
-        width: 100px;
+    div.page-wrapper .related-page-list:is(div, section) .grid li.page-list-item.grid-style-item {
+        width: calc(100px - 2px) !important;
     }
 }
 
