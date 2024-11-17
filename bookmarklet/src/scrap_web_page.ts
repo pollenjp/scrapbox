@@ -129,13 +129,13 @@ Element.prototype.getChildElementByTagNameAndId = function (params) {
   throw new Error(`Element not found: ${tagName} ${params.id} ${this}`)
 }
 
-type GetChildElementByTagNameAndIdParamsv1 = {
+type GetChildElementByTagNameAndIdParamsV1 = {
   element: Element
   tagName: string
   id: string
 }
 
-function getChildElementByTagNameAndId(params: GetChildElementByTagNameAndIdParamsv1): Element {
+function getChildElementByTagNameAndId(params: GetChildElementByTagNameAndIdParamsV1): Element {
   const tagName = params.tagName.toUpperCase()
   for (const elem of params.element.children) {
     if (elem.tagName !== tagName) {
@@ -289,7 +289,7 @@ class PageParser {
    * Should be override.
    */
   parsePostCustom() {
-    throw new Error("Not Implemented Error: This method should be overrided.")
+    throw new Error("Not Implemented Error: This method should be overridden.")
   }
 
   /**
@@ -500,7 +500,7 @@ class QiitaComPageParser extends PageParser {
 }
 
 /**
- * speackerdeck.com
+ * speakerdeck.com
  */
 class SpeakerdeckComPageParser extends PageParser {
   /**
