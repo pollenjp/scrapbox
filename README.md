@@ -1,1 +1,1 @@
-# scrapbox-bookmarklet
+# scrapbox

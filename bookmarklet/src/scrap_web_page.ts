@@ -602,7 +602,7 @@ class YouTubeComPageParser extends PageParser {
       case "watch":
       case "live": {
         /* https://www.youtube.com/live/HilaOz31AfU */
-        this.preAtVideoPage()
+        this.preAtWatchOrLivePage({ pageType: this._urlPathList[0] })
         return
       }
       case "playlist": {
@@ -661,7 +661,11 @@ class YouTubeComPageParser extends PageParser {
     console.log("debug: no processing.")
   }
 
-  extractVideoIdFromVideoUrl(url: URL): string {
+  /**
+   * example:
+   * https://www.youtube.com/watch?v=MjcyTIB9nz0&list=PLjFz-Ge41_es-0slEmGltRLp6Ym6gtunZ&index=3
+   */
+  static extractVideoIdFromWatchUrl(url: URL): string {
     const videoId = url.searchParams.get("v")
     if (videoId === null) {
       throw new Error(`Failed to get video id from the url (${url})`)
@@ -670,9 +674,26 @@ class YouTubeComPageParser extends PageParser {
   }
 
   /**
+   * example:
+   * https://www.youtube.com/live/Cpn0ZIcHz-w
+   */
+  static extractVideoIdFromLiveUrl(url: URL): string {
+    const videoId = splitUrlPath(url.pathname).at(-1)
+    if (videoId === undefined) {
+      throw new Error(`Failed to get video id from the url (${url})`)
+    }
+    return videoId
+  }
+
+  /**
    *
    */
-  preAtVideoPage() {
+  preAtWatchOrLivePage({ pageType }: { pageType: "watch" | "live" }) {
+    const videoId =
+      pageType === "watch"
+        ? YouTubeComPageParser.extractVideoIdFromWatchUrl(this._url)
+        : YouTubeComPageParser.extractVideoIdFromLiveUrl(this._url)
+
     let channelUrl: URL
     {
       const elem = this._document
@@ -692,7 +713,6 @@ class YouTubeComPageParser extends PageParser {
           throw new Error("Failed to get channel id")
         })()
     )
-    const videoId = this.extractVideoIdFromVideoUrl(this._url)
     const ds = format(
       YouTubeComPageParser.extractVideoUploadDateFromVideoPage(document),
       "yyyy-MM-dd"
@@ -705,7 +725,7 @@ class YouTubeComPageParser extends PageParser {
    *
    */
   postAtVideoPage() {
-    const videoId = this.extractVideoIdFromVideoUrl(this._url)
+    const videoId = YouTubeComPageParser.extractVideoIdFromWatchUrl(this._url)
     const thumbnailImageUrl = new URL(`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`)
 
     this._body.push(`[${this._url.toString()}]`, `[${thumbnailImageUrl.toString()}]`)
