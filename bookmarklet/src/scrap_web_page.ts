@@ -73,9 +73,17 @@ function safeWrapTitle(title: string, hostname: string) {
 function getTwitterImageUrls(imageElems: HTMLImageElement[]): URL[] {
   const imgUrls: URL[] = []
   imageElems.forEach(function (imgElem) {
-    if (imgElem.alt == "Image" || imgElem.alt == "画像") {
+    if (
+      imgElem.alt.toLowerCase() == "image" /* 普通 */ ||
+      imgElem.alt.toLowerCase() == "画像" /* 日本語ページ */ ||
+      imgElem.alt.toLowerCase() == "opens profile photo" /* profile photo */
+    ) {
       const img_url = new URL(imgElem.src)
-      imgUrls.push(new URL(`${img_url.origin}${img_url.pathname}.jpg`))
+      if (!img_url.toString().endsWith(".jpg")) {
+        /* scrapbox では末尾に画像 suffix ないと preview 展開されない */
+        img_url.hash = "#.jpg"
+      }
+      imgUrls.push(img_url)
     }
   })
   return imgUrls
@@ -1080,7 +1088,8 @@ function parsePage(title: string, this_page_url: URL, document: Document): Parse
     }
 
     case "twitter.com":
-    case "mobile.twitter.com": {
+    case "mobile.twitter.com":
+    case "x.com": {
       return new TwitterComPageParser(title, this_page_url, document).do()
     }
 
