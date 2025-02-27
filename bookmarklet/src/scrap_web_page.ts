@@ -13,7 +13,7 @@ class ParsedData {
   }
 
   get title() {
-    return this._title
+    return this._title.slice(0, 240)
   }
 
   get body() {
@@ -67,7 +67,18 @@ function safeWrapTitle(title: string, hostname: string) {
     return title
   }
 
-  return `${title} (${hostname})`
+  /**
+   * 240 文字制限: * scrapbox の title 長さ制限に引っかかるときがある
+   */
+  const length_limit = 240
+
+  const title_try = `${title} (${hostname})`
+  if (title_try.length <= length_limit) {
+    return title_try
+  }
+
+  const over_length = title_try.length - length_limit
+  return `${title.slice(0, title.length - over_length)} (${hostname})`
 }
 
 function getTwitterImageUrls(imageElems: HTMLImageElement[]): URL[] {
