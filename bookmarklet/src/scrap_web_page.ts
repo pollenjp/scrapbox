@@ -324,30 +324,19 @@ class PageParser {
 
     /* body */
 
-    const s = window.getSelection()
-    const quote = s !== null ? s.toString() : ""
-
-    let quoteLines: (string | null)[] = []
-    if (quote.trim()) {
-      /* 空白行を null に置き換える */
-      quoteLines = quote.split(/\n/g).map(function (line: string) {
-        if (line !== "") {
-          return `  > ${line}`
-        }
-        return null
-      })
-    }
-
-    /* 空白行 (null) の削除 */
-
-    for (let i = 0; i < quoteLines.length; ++i) {
-      quoteLines.forEach((line) => {
-        if (line !== null) {
-          this._body.push(line)
-        }
-      })
-    }
+    const selection = window.getSelection()
+    const quote = selection !== null ? selection.toString() : ""
+    this._body = this._body.concat(
+      filterLines(quote.trim().split(/\n/g)).map((line) => `> ${line}`)
+    )
   }
+}
+
+/**
+ * remove empty lines
+ */
+const filterLines = (lines: string[]): string[] => {
+  return lines.filter((line) => line.trim() !== "")
 }
 
 class OtherPageParser extends PageParser {
