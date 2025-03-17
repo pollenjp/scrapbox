@@ -1033,8 +1033,11 @@ class YouTubeComPageParser extends PageParser {
     }
 
     {
-      /* 563 回視聴 • 14 時間前にライブ配信 */
-      const regex = /.*• (?<hour>[0-9]{2}) 時間前.*/
+      /**
+       * 563 回視聴 • 14 時間前にライブ配信
+       * 553,517 回視聴 • 15 時間 前に公開済み
+       */
+      const regex = /.*• (?<hour>[0-9]{2}) 時間 *前.*/
       const match = regex.exec(t)
       if (match !== null && match.groups !== undefined) {
         const hour = Number(match.groups.hour)
