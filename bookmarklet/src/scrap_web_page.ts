@@ -744,130 +744,47 @@ class YouTubeComPageParser extends PageParser {
    */
   preAtPlaylistPage() {
     /**
-     * @param {Element} root
-     * @returns {string}
+     * プレイリストのタイトルを取得する
      */
-    function getPlaylistName(root: Element) {
-      let element = root
-      element = getChildElementByTagName(element, "body")
-      element = getChildElementByTagName(element, "ytd-app")
-      element = getChildElementByTagNameAndId({
-        element: element,
-        tagName: "div",
-        id: "content"
-      })
-      element = getChildElementByTagName(element, "ytd-page-manager")
-      element = getChildElementByTagName(element, "ytd-browse")
-      element = getChildElementByTagName(element, "ytd-playlist-header-renderer")
-      element = getChildElementByTagNameAndClass(element, "div", [
-        "immersive-header-container",
-        "style-scope",
-        "ytd-playlist-header-renderer"
-      ])
-      element = getChildElementByTagNameAndClass(element, "div", [
-        "immersive-header-content",
-        "style-scope",
-        "ytd-playlist-header-renderer"
-      ])
-      element = getChildElementByTagNameAndClass(element, "div", [
-        "thumbnail-and-metadata-wrapper",
-        "style-scope",
-        "ytd-playlist-header-renderer"
-      ])
-      element = getChildElementByTagNameAndClass(element, "div", [
-        "metadata-wrapper",
-        "style-scope",
-        "ytd-playlist-header-renderer"
-      ])
-      element = getChildElementByTagName(element, "yt-dynamic-sizing-formatted-string")
-      element = getChildElementByTagNameAndId({
-        element: element,
-        tagName: "div",
-        id: "container"
-      })
-      element = getChildElementByTagNameAndId({
-        element: element,
-        tagName: "yt-formatted-string",
-        id: "text"
-      })
-      console.log(element)
-      if (element instanceof HTMLElement) {
-        return element.innerText
+    function getPlaylistName(root: Element): string {
+      const element =
+        root
+          .querySelector("#page-header")
+          ?.querySelector(".page-header-view-model-wiz__page-header-title") ||
+        (() => {
+          throw new Error("Failed to get element at `getPlaylistName`")
+        })()
+      if (!(element instanceof HTMLElement)) {
+        throw new Error(`Failed to get playlist name. the element is not HTMLElement. (${element})`)
       }
-      throw new Error(`Failed to get playlist name. the element is not HTMLElement. (${element})`)
+      return element.innerText
     }
 
     const playlistName = getPlaylistName(this._document.documentElement)
 
-    interface ChannelInfo {
-      name: string
-      url: URL
-    }
-
-    function getChannelNameAndURL(root: Element): ChannelInfo {
-      let element = root
-      element = getChildElementByTagName(element, "body")
-      element = getChildElementByTagName(element, "ytd-app")
-      element = getChildElementByTagNameAndId({
-        element: element,
-        tagName: "div",
-        id: "content"
-      })
-      element = getChildElementByTagName(element, "ytd-page-manager")
-      element = getChildElementByTagName(element, "ytd-browse")
-      element = getChildElementByTagName(element, "ytd-playlist-header-renderer")
-      element = getChildElementByTagNameAndClass(element, "div", [
-        "immersive-header-container",
-        "style-scope",
-        "ytd-playlist-header-renderer"
-      ])
-      element = getChildElementByTagNameAndClass(element, "div", [
-        "immersive-header-content",
-        "style-scope",
-        "ytd-playlist-header-renderer"
-      ])
-      element = getChildElementByTagNameAndClass(element, "div", [
-        "thumbnail-and-metadata-wrapper",
-        "style-scope",
-        "ytd-playlist-header-renderer"
-      ])
-      element = getChildElementByTagNameAndClass(element, "div", [
-        "metadata-wrapper",
-        "style-scope",
-        "ytd-playlist-header-renderer"
-      ])
-      element = getChildElementByTagNameAndClass(element, "div", [
-        "metadata-action-bar",
-        "style-scope",
-        "ytd-playlist-header-renderer"
-      ])
-      element = getChildElementByTagNameAndClass(element, "div", [
-        "metadata-text-wrapper",
-        "style-scope",
-        "ytd-playlist-header-renderer"
-      ])
-      element = getChildElementByTagNameAndClass(element, "div", [
-        "metadata-owner",
-        "style-scope",
-        "ytd-playlist-header-renderer"
-      ])
-      element = getChildElementByTagNameAndId({
-        element: element,
-        tagName: "yt-formatted-string",
-        id: "owner-text"
-      })
-      element = getChildElementByTagName(element, "a")
+    /**
+     *
+     * @param root
+     * @returns YouTube account id such like `@some_name`
+     */
+    function getChannelAccountId(root: Element): URL {
+      const element =
+        root
+          .querySelector("#page-header")
+          ?.querySelector(".page-header-view-model-wiz__page-header-content-metadata")
+          ?.querySelector(".yt-core-attributed-string__link") ||
+        (() => {
+          throw new Error("Failed to get element at `getChannelAccountId`")
+        })()
       if (!(element instanceof HTMLAnchorElement)) {
         throw new Error(
-          `Failed to get channel name and url. the element is not HTMLAnchorElement. (${element})`
+          `Failed to get channel account id. the element is not HTMLAnchorElement. (${element})`
         )
       }
-      return { name: element.text, url: new URL(element.href) }
+      return new URL(element.href)
     }
 
-    const channelInfo = getChannelNameAndURL(this._document.documentElement)
-
-    console.log(channelInfo.name, channelInfo.url)
+    const accountUrl = getChannelAccountId(this._document.documentElement)
 
     const playlistId = this._url.searchParams.get("list")
     if (playlistId === null) {
@@ -875,7 +792,7 @@ class YouTubeComPageParser extends PageParser {
     }
 
     const channelId = decodeURIComponent(
-      splitUrlPath(channelInfo.url.pathname).at(-1) ||
+      splitUrlPath(accountUrl.pathname).at(-1) ||
         (() => {
           throw new Error("Failed to get channel id")
         })()
