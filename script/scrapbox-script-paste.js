@@ -44,90 +44,13 @@ class CustomUrlData {
 }
 
 const urlToIconName = {
-  connpass_web_link: new CustomUrlData({
-    hostname: "connpass.com",
-    icon_str: "[connpass.icon]",
-  }),
-  discord_web_link: new CustomUrlData({
-    hostname: "discord.com",
-    icon_str: "",
-    memo: `#date${new CustomDatetime().format("yyyy-MM-dd")} `,
-  }),
   evernote_web_link: new CustomUrlData({
-    hostname: "www.evernote.com",
+    hostname: "share.evernote.com",
     icon_str: "",
     custom_link_name: `evernote-link`,
     memo: `[Evernote Scan Data] [Scan Data] #date${new CustomDatetime().format(
       "yyyy-MM-dd"
     )} `,
-  }),
-  google_photo: new CustomUrlData({
-    hostname: "photos.google.com",
-    icon_str: "[Google Photo.icon]",
-  }),
-  google_drive: new CustomUrlData({
-    hostname: "drive.google.com",
-    icon_str: "[Google Drive.icon]",
-  }),
-  google_docs: new CustomUrlData({
-    hostname: "docs.google.com",
-    icon_str: "[Google Docs.icon]",
-    path_list: ["document"],
-  }),
-  google_sheets: new CustomUrlData({
-    hostname: "docs.google.com",
-    icon_str: "[Google Sheets (spreadsheet).icon]",
-    path_list: ["spreadsheets"],
-  }),
-  google_slide: new CustomUrlData({
-    hostname: "docs.google.com",
-    icon_str: "[Google Slide.icon]",
-    path_list: ["presentation"],
-  }),
-  hackmd: new CustomUrlData({
-    hostname: "hackmd.IO",
-    icon_str: "[(icon) HackMD.icon]",
-  }),
-  InternetArchive: new CustomUrlData({
-    hostname: "web.archive.org",
-    icon_str: "[(icon) Internet Archive.icon]",
-  }),
-  notion: new CustomUrlData({
-    hostname: "www.notion.so",
-    icon_str: "[(icon) Notion.icon]",
-  }),
-  jp_gr_kmc: new CustomUrlData({
-    hostname: "kmc.gr.jp",
-    icon_str: "[(icon) KMC.icon]",
-  }),
-  jp_gr_kmc_inside: new CustomUrlData({
-    hostname: "inside.kmc.gr.jp",
-    icon_str: "[(icon) KMC.icon]",
-  }),
-  paperswithcode: new CustomUrlData({
-    hostname: "paperswithcode.com",
-    icon_str: "[@paperswithcode Papers with Code.icon]",
-  }),
-  qiita: new CustomUrlData({
-    hostname: "qiita.com",
-    icon_str: "[Qiita.icon]",
-  }),
-  pypi: new CustomUrlData({
-    hostname: "pypi.org",
-    icon_str: "[(icon) PyPI.icon]",
-  }),
-  udemy: new CustomUrlData({
-    hostname: "www.udemy.com",
-    icon_str: "[Udemy.icon]",
-  }),
-  zenn: new CustomUrlData({
-    hostname: "zenn.dev",
-    icon_str: "[Zenn.icon]",
-  }),
-  // tmp
-  MoodleSophia: new CustomUrlData({
-    hostname: "moodle.cc.sophia.ac.jp",
-    icon_str: "[Moodle.icon]",
   }),
 };
 function insertUrl(url) {
@@ -172,6 +95,8 @@ function insertUrl(url) {
         text += ` ${custom_url_data.memo}`;
       }
 
+      text += "\n";
+
       console.log(text);
       break;
     }
@@ -195,7 +120,7 @@ function convertEvernoteLinkApp2Web(app_link) {
     /evernote:\/\/\/view\/(?<ID1>[0-9]+)\/(?<ID2>[a-zA-Z0-9-]+)\/(?<ID3>[a-zA-Z0-9-]+)\/(?<ID4>[a-zA-Z0-9-]+)(?<query>[\s]*)/;
   let match_groups = app_link.match(rx).groups;
   console.log(match_groups);
-  return `https://www.evernote.com/shard/${match_groups.ID2}/nl/${match_groups.ID1}/${match_groups.ID3}`;
+  return `https://share.evernote.com/note/${match_groups.ID3}`;
 }
 
 document.addEventListener("paste", (event) => {
@@ -220,19 +145,15 @@ document.addEventListener("paste", (event) => {
     }
 
     if (isValidUrl(line)) {
+      console.log("isValidUrl(line) is true");
       let url = new URL(line);
       console.log(url.toString());
       if (url.hostname == SCRAPBOX_URL_HOSTNAME) {
         insertScrapboxUrl(url, event);
       } else {
         insertUrl(url);
-
-        if (url.hostname == urlToIconName["twitter"].hostname) {
-          insertText("\n");
-        } else {
-          event.preventDefault();
-        }
       }
+      // event.preventDefault();
     }
   }
   return;
