@@ -30,29 +30,48 @@ function insertScrapboxUrl(url, event) {
 class CustomUrlData {
   constructor({
     hostname,
-    icon_str,
-    custom_link_name = null,
-    memo = null,
     path_list = null,
+    custom_parser = null,
   }) {
     this.hostname = hostname;
-    this.icon_str = icon_str;
-    this.custom_link_name = custom_link_name;
-    this.memo = memo;
     this.path_list = path_list;
+    /**
+     * @typedef {function(URL): string} CustomParser
+     * @param {URL} url - URLのパラメータ
+     * @returns {string} - 文章に埋め込んだ際の文字列を返す
+     */
+    /**
+     * @type {CustomParser}
+     */
+    this.custom_parser = custom_parser || ((url) => {
+      return `${url.toString()}`;
+    });
   }
 }
 
 const urlToIconName = {
   evernote_web_link: new CustomUrlData({
-    hostname: "share.evernote.com",
-    icon_str: "",
-    custom_link_name: `evernote-link`,
+    hostname: "www.evernote.com",
     memo: `[Evernote Scan Data] [Scan Data] #date${new CustomDatetime().format(
       "yyyy-MM-dd"
     )} `,
+    custom_parser: (url) => {
+      /**
+       * `https://www.evernote.com/shard/${match_groups.ID2}/nl/${match_groups.ID1}/${match_groups.ID3}`;
+       */
+      // ID3 は noteId
+      let noteId = url.pathname.split("/")[4];
+      let shareUrl = `https://share.evernote.com/note/${noteId}`;
+
+      return `[evernote-link ${url.toString()}] [share-link ${shareUrl}] [Evernote Scan Data] [Scan Data] #date${
+        new CustomDatetime().format(
+          "yyyy-MM-dd"
+        )
+      } `;
+    },
   }),
 };
+
 function insertUrl(url) {
   console.log("insertUrl was called!");
   let text = "";
@@ -78,22 +97,8 @@ function insertUrl(url) {
         }
       }
       var custom_url_data = urlToIconName[key];
-      console.log(
-        `custom_url_data.custom_link_name = ${custom_url_data.custom_link_name}`
-      );
       text = "";
-      if (custom_url_data.icon_str) {
-        text = `${custom_url_data.icon_str} `;
-      }
-      if (custom_url_data.custom_link_name) {
-        text += `[${custom_url_data.custom_link_name} ${url.toString()}]`;
-      } else {
-        text += `[${url.toString()}]`;
-      }
-
-      if (custom_url_data.memo) {
-        text += ` ${custom_url_data.memo}`;
-      }
+      text += custom_url_data.custom_parser(url);
 
       text += "\n";
 
@@ -106,21 +111,22 @@ function insertUrl(url) {
   return;
 }
 
-const isValidEvernoteAppLink = (text) => {
-  var urlRegex = /(evernote:\/\/\/[^\s]+)/;
-  var ret_val = text.match(urlRegex); // true or null
-  if (ret_val) {
-    return true;
-  }
-  return false;
-};
-
+/**
+ *
+ * @param {string} app_link
+ * @returns {string | null}
+ */
 function convertEvernoteLinkApp2Web(app_link) {
   let rx =
     /evernote:\/\/\/view\/(?<ID1>[0-9]+)\/(?<ID2>[a-zA-Z0-9-]+)\/(?<ID3>[a-zA-Z0-9-]+)\/(?<ID4>[a-zA-Z0-9-]+)(?<query>[\s]*)/;
-  let match_groups = app_link.match(rx).groups;
+  let match_groups = app_link.match(rx)?.groups;
+  if (!match_groups) {
+    return null;
+  }
   console.log(match_groups);
-  return `https://share.evernote.com/note/${match_groups.ID3}`;
+  return `https://www.evernote.com/shard/${match_groups.ID2}/nl/${match_groups.ID1}/${match_groups.ID3}`;
+  // return `https://share.evernote.com/note/${match_groups.ID3}`;
+  // return `https://www.evernote.com/client/web#/notes/${match_groups.ID3}` // これは無効
 }
 
 document.addEventListener("paste", (event) => {
@@ -140,9 +146,7 @@ document.addEventListener("paste", (event) => {
   if (lines.length == 1) {
     var line = lines[0];
 
-    if (isValidEvernoteAppLink(line)) {
-      line = convertEvernoteLinkApp2Web(line);
-    }
+    line = convertEvernoteLinkApp2Web(line) || line
 
     if (isValidUrl(line)) {
       console.log("isValidUrl(line) is true");
