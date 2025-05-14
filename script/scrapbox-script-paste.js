@@ -60,7 +60,10 @@ const urlToIconName = {
        * `https://www.evernote.com/shard/${match_groups.ID2}/nl/${match_groups.ID1}/${match_groups.ID3}`;
        */
       // ID3 は noteId
-      let noteId = url.pathname.split("/")[4];
+      /**
+       * @type {string | undefined}
+       */
+      let noteId = url.pathname.split("/").at(5);
       let shareUrl = `https://share.evernote.com/note/${noteId}`;
 
       return `[evernote-link ${url.toString()}] [share-link ${shareUrl}] [Evernote Scan Data] [Scan Data] #date${
