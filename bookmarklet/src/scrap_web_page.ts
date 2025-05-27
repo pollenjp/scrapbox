@@ -827,7 +827,17 @@ class YouTubeComPageParser extends PageParser {
         })()
     )
 
-    this._title = `${this._document.title}${returnTitlePathPart(this._url.pathname)}`
+    // get '.ytShortsVideoTitleViewModelShortsVideoTitle'
+    const title = (() => {
+      const titleElem = this._document.querySelector(".ytShortsVideoTitleViewModelShortsVideoTitle")
+      if (titleElem === null) {
+        // throw new Error("Failed to get title element")
+        return null
+      }
+      return titleElem.textContent
+    })()
+
+    this._title = `${title || this._document.title}${returnTitlePathPart(this._url.pathname)}`
     this._body.push(`[${generateYouTubeUserPageTitle(channelId)}]`)
   }
 
