@@ -92,7 +92,9 @@ div.page-wrapper .related-page-list:is(div, section) .grid-style-item .content .
         display: flex;
     }
 
-    div.page-wrapper .drag-and-drop-enter {
+    div.page-wrapper main /* For anonymous users */
+    ,div.page-wrapper .drag-and-drop-enter
+    {
         order: 2;
         /* width: calc(100% - 200px); */
         width: 100%;
