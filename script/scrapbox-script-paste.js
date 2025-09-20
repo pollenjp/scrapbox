@@ -23,7 +23,7 @@ function insertScrapboxUrl(url, event) {
     if (match) {
       let url_base_str = `https://${match.groups.hostname}`
       let url_path = decodeURIComponent(match.groups.path)
-      insertText(`[${url_base_str}/${url_path}]`);
+      insertText(`[link ${url_base_str}/${url_path}]`);
     }
     return;
   }
