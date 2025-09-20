@@ -13,11 +13,23 @@ function insertScrapboxUrl(url, event) {
   let url_elements = decodeURI(url.pathname).split("/").slice(1);
   let project_name = url_elements[0];
 
-  if (project_name != PROJECT_NAME) {
-    // default behavior when scrapbox url
+  if (project_name == PROJECT_NAME) {
+    // if end with ` (/path/to/page.html) (some.domain.example.com)`,
+    // then insert url to head of the line `https://some.domain.example.com/path/to/page.html`
+    //
+    // `%2F` is `/`
+    const reg = /\(%2F(?<path>.*)\)_\((?<hostname>.*)\)$/;
+    const match = url.pathname.match(reg);
+    if (match) {
+      let url_base_str = `https://${match.groups.hostname}`
+      let url_path = decodeURIComponent(match.groups.path)
+      insertText(`[${url_base_str}/${url_path}]`);
+    }
     return;
   }
 
+  // default behavior when scrapbox url
+  return;
   // let text;
   // let page_title = url_elements[1];
   // if (page_title.substring(0, 1) == "@") {
