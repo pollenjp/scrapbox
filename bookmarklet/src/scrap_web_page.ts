@@ -349,15 +349,6 @@ class OtherPageParser extends PageParser {
 }
 
 /**
- * atcoder.jp
- */
-class AtcoderJpPageParser extends PageParser {
-  parsePreCustom() {
-    this._title += ` (${this._urlPathList.slice(0, 2).join("/")})`
-  }
-}
-
-/**
  * github.com
  * gitlab.com
  */
@@ -990,9 +981,6 @@ class YouTubeComPageParser extends PageParser {
 function parsePage(title: string, this_page_url: URL, document: Document): ParsedData {
   console.log("parsePage")
   switch (this_page_url.hostname) {
-    case "atcoder.jp": {
-      return new AtcoderJpPageParser(title, this_page_url, document).do()
-    }
     case "github.com":
     case "gitlab.com": {
       return new GitHubComPageParser(title, this_page_url, document).do()
