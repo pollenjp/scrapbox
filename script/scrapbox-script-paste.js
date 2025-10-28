@@ -18,12 +18,20 @@ function insertScrapboxUrl(url, event) {
     // then insert url to head of the line `https://some.domain.example.com/path/to/page.html`
     //
     // `%2F` is `/`
-    const reg = /\(%2F(?<path>.*)\)_\((?<hostname>.*)\)$/;
-    const match = url.pathname.match(reg);
+    const match = url.pathname.match(/\(%2F(?<path>.*)\)_\((?<hostname>.*)\)$/);
     if (match) {
       let url_base_str = `https://${match.groups.hostname}`
       let url_path = decodeURIComponent(match.groups.path)
       insertText(`[link ${url_base_str}/${url_path}] `);
+      return
+    }
+    const match_github = url.pathname.match(/^(?<path>.*)_\((?<hostname>.*)\)$/);
+    if (match_github && match_github.groups.hostname == "github.com") {
+      // if end with `(github.com)`
+      let url_base_str = `https://github.com`
+      let url_path = decodeURIComponent(match_github.groups.path)
+      insertText(`[link ${url_base_str}/${url_path}] `);
+      return
     }
     return;
   }
