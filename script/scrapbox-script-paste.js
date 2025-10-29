@@ -25,11 +25,11 @@ function insertScrapboxUrl(url, event) {
       insertText(`[link ${url_base_str}/${url_path}] `);
       return
     }
-    const match_github = url.pathname.match(/^(?<path>.*)_\((?<hostname>.*)\)$/);
-    if (match_github && match_github.groups.hostname == "github.com") {
+    const match_title_hostname = url.pathname.match(/.*\/(?<path>[^\/]*)_\((?<hostname>.*)\)$/);
+    if (match_title_hostname && match_title_hostname.groups.hostname == "github.com") {
       // if end with `(github.com)`
       let url_base_str = `https://github.com`
-      let url_path = decodeURIComponent(match_github.groups.path)
+      let url_path = decodeURIComponent(match_title_hostname.groups.path)
       insertText(`[link ${url_base_str}/${url_path}] `);
       return
     }
