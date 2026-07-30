@@ -5,16 +5,30 @@
 Scrapbox から export したデータを
 
 1. **GitHub 上に Markdown として保存**（`pollenjp/scrapbox-data`）
-2. **それを元に Notion へページを作成**（Notion API / Notion MCP）
+2. **それを元に Notion へページを作成**（Notion REST API）
 
-する一連のスクリプトを `pollenjp/scrapbox` で管理する。
+する一連のスクリプトを `pollenjp/scrapbox` で管理する。Scrapbox は移行後も使い続けるので、1 回きりの移行ではなく**継続的な差分同期**として設計する。
 
 | 対象 | リポジトリ | 可視性 |
 | --- | --- | --- |
 | 変換・投入スクリプト | `pollenjp/scrapbox` | public |
-| export 原本・生成 Markdown・画像・移行状態 | `pollenjp/scrapbox-data` | **private** |
+| export 原本・生成 Markdown・画像・同期状態 | `pollenjp/scrapbox-data` | **private** |
 
 スクリプトが public、データが private という分割なので、**スクリプト側にプロジェクト名・ページタイトル・トークンを一切ハードコードしない**（すべて引数か環境変数）ことが設計上の制約になる。
+
+## 決定事項
+
+| # | 項目 | 決定 |
+| --- | --- | --- |
+| Q2 | Notion の投入先 | **個人ワークスペース**。接続済み MCP（会社ワークスペース「スリーシェイク」）は投入先ではないので**使わない**。個人ワークスペースの internal integration token を用意して REST API で投入する |
+| Q3 | Notion 側の構造 | **データベース**。タイトル・作成日・更新日・タグをプロパティ化する（§6） |
+| Q5 | 移行後の Scrapbox | **更新を続ける**。1 回で終わる移行ではなく**継続的な差分同期**として設計する（§9・Phase 6） |
+
+Q2 の帰結として、**Notion に触る処理はすべて REST API のローカル実行または GitHub Actions 実行**になる。MCP はパイロットにも使えない（別ワークスペースなので、そこに作ったページは成果物にならない）。
+
+また「会社ワークスペースのトークンを誤って使うと私物が社内に出る」という事故が起こりうるので、`push` の先頭で **`GET /v1/users/me` を叩いて workspace が期待どおりかを検証し、違っていたら即座に abort する** preflight を入れる（§10 リスク #11）。
+
+Q5 の帰結として、`state/` は「移行の記録」ではなく**継続運用される同期状態**になる。削除・リネームの扱いを最初から設計に入れる（§9.2）。
 
 ## 2. 調査で確定した前提
 
@@ -45,8 +59,9 @@ Scrapbox から export したデータを
 
 ### 2.2 Notion 側
 
-- MCP は **ワークスペース「スリーシェイク」** に接続済み（`create_pages` / `update_page` / `create_database` すべて available）。
-- REST API は **Markdown を直接受け付ける**。`POST /v1/pages` の `markdown` パラメータ（`children` / `content` と排他）。`properties.title` を省略すると先頭の `# h1` がタイトルになる。読み出しは `GET /v1/pages/{page_id}/markdown`、追記は `PATCH /v1/blocks/{page_id}/children`。
+- REST API は **Markdown を直接受け付ける**。`POST /v1/pages` の `markdown` パラメータ（`children` / `content` と排他）。`properties.title` を省略すると先頭の `# h1` がタイトルになるが、**データベース配下に作る本計画ではタイトルは `properties` で明示的に渡す**（h1 に依存させない）。読み出しは `GET /v1/pages/{page_id}/markdown`、追記は `PATCH /v1/blocks/{page_id}/children`。
+- API `2025-09-03` 以降、データベースは **database → data source → page** の階層になった。データベース配下にページを作るときの `parent` は `{"type": "data_source_id", "data_source_id": "…"}`。`create_database` のレスポンスから data source id を取り出して `state/` に保存する。
+- 接続済み MCP はワークスペース「スリーシェイク」向けなので**本計画では使わない**（→ 決定事項 Q2）。
 - ⚠️ `Notion-Version` ヘッダの値は情報が食い違っている（API 全体は `2025-09-03`、Markdown 系エンドポイントは `2026-03-11` が必要という記述もある）。**実装前に実リクエストで確定させる**（→ Phase 3 の spike）。
 - 受け付ける Markdown は **Notion-flavored Markdown (NFM)** であり GitHub Flavored Markdown (GFM) と互換ではない（§5 参照）。
 - リクエスト制限:
@@ -68,13 +83,13 @@ Scrapbox から export したデータを
 | `scrapbox.io` | ❌ 403 (policy) | **export をこの環境から実行できない** |
 | `api.notion.com` | ❌ 403 (policy) | **REST API push をこの環境から実行できない** |
 | `gyazo.com` / `i.gyazo.com` | ❌ 403 (policy) | **画像ダウンロードをこの環境から実行できない** |
-| Notion MCP | ✅ | MCP 経由の push のみ可 |
+| Notion MCP | ✅（ただし別ワークスペース） | 投入先が個人ワークスペースなので**使わない** |
 
-したがって
+**この制約は「この Claude セッションの sandbox」に限った話で、GitHub Actions のランナーには適用されない。** Actions は通常のインターネットアクセスを持つので、export・画像取得・push をすべて実行できる。したがって:
 
-- **ネットワークを触るステージ（export / 画像取得 / REST push）はローカル実行が前提。**
-- この環境で完結できるのは **JSON → Markdown の純変換とテスト**（外部通信なし）。CI もここだけなら回せる。
-- どうしても remote から通したい場合の選択肢は (a) 環境のネットワークポリシーに `scrapbox.io` / `api.notion.com` / `gyazo.com` を追加、(b) push を Notion MCP 経由にする、の 2 つ。(b) はエージェント駆動なので冪等性・大量処理・再開に向かない → **パイロットと目視確認用に限定**するのが妥当。
+- **この環境で完結できるのは JSON → Markdown の純変換とテスト**（外部通信なし）。開発とレビューはここでできる。
+- **ネットワークを触るステージ（export / 画像取得 / push）は「ローカル実行」または「GitHub Actions 実行」。** Q5（継続的な差分同期）を選んだので、最終的な定常運用は Actions に載せる（Phase 6）。
+- この環境から直接通したい場合は、環境のネットワークポリシーに `scrapbox.io` / `api.notion.com` / `gyazo.com` を追加する必要がある。必須ではない（Actions とローカルで足りる）。
 
 ## 3. 全体アーキテクチャ
 
@@ -159,6 +174,7 @@ scrapbox/
 scrapbox-data/
 ├── README.md                       # レイアウトと再生成手順
 ├── .gitattributes                  # assets を git-lfs に
+├── .github/workflows/sync.yml      # 定期差分同期（Phase 6）
 ├── raw/
 │   └── <project>/
 │       └── 2026-07-30T120000Z.json # export 原本。追記のみ・書き換えない
@@ -174,14 +190,15 @@ scrapbox-data/
 └── state/
     └── <project>/
         ├── index.json              # title ↔ slug ↔ scrapbox page id
-        └── notion-index.json       # scrapbox page id → notion page id + hash
+        ├── notion-index.json       # scrapbox page id → notion page id + hash
+        └── assets.json             # 画像 sha256 → Notion file id
 ```
 
 方針:
 
-- `raw/` は **immutable なスナップショット**。日時つきで積む。「最新」はファイル名順で決め、symlink は使わない（Windows 対策）。
+- `raw/` は **immutable なスナップショット**。日時つきで積む。「最新」はファイル名順で決め、symlink は使わない（Windows 対策）。差分同期で「前回」と「今回」を突き合わせるので、少なくとも直近 2 世代は必ず残す。
 - `markdown/` `notion/` `assets/` は `raw/` から **完全に再生成可能**。手で編集しない（README に明記）。
-- `state/` だけは Notion 側の副作用の記録なので再生成不可 → **最重要ファイル**。壊すと重複ページを作る。
+- `state/` だけは Notion 側の副作用の記録なので再生成不可 → **最重要ファイル**。壊すと重複ページを作る。`Scrapbox ID` プロパティから再構築する手段は用意する（§6）が、あくまで復旧用。
 - `assets/` は content-addressed（sha256）にして重複排除。バイナリなので `.gitattributes` で git-lfs 対象にする。`raw/*.json` も数 MB を超えるなら lfs 検討。
 
 ## 5. 記法変換表
@@ -228,7 +245,28 @@ NFM 固有の注意（公式 spec より）:
 
 Scrapbox の `[* ]` は「見出し」ではなく「サイズ付き太字」だが、実運用では見出しとして使われている。**行全体を覆っている装飾だけを見出しに昇格し、行内なら太字のまま**にする。これが誤爆が最も少ない。`convert --heading-mode {promote|bold}` で切り替えられるようにして、実データを見て決める。
 
-## 6. Frontmatter 仕様
+## 6. Notion データベーススキーマ
+
+Q3 の決定に従い、プロジェクトごとに 1 データベースを作る（`sb2n init-db --project <name>`）。プロパティは Scrapbox の metadata をそのまま検索軸にできるものだけに絞る。
+
+| プロパティ | 型 | 由来 | 用途 |
+| --- | --- | --- | --- |
+| `Title` | `title` | `pages[].title` | ページ名。**主キーではない**（リネームされる） |
+| `Created` | `date` | `pages[].created` (unix → ISO8601) | 時系列で並べる |
+| `Updated` | `date` | `pages[].updated` | 最近触ったものを出す |
+| `Tags` | `multi_select` | 本文の `#tag` | Scrapbox のタグ検索の代替 |
+| `Scrapbox ID` | `rich_text` | `pages[].id` | **突き合わせの主キー**。差分同期でこれを引く |
+| `Scrapbox URL` | `url` | 構築 | 原本へ戻れるようにする |
+| `Views` | `number` | `pages[].views` | 参考情報（同期対象外にしてもよい） |
+| `Synced At` | `date` | 同期実行時刻 | 同期漏れの検出 |
+
+補足:
+
+- **`Scrapbox ID` にインデックス代わりのフィルタを効かせて突き合わせる**が、Notion にユニーク制約はないので重複は防げない。重複防止は `state/notion-index.json` 側の責務（§9）。`Scrapbox ID` プロパティは state ファイルを失った場合の復旧手段（Notion 側だけから index を再構築できる）として持つ。
+- `Views` は Scrapbox 側で常に増えるので、これを同期対象にすると**全ページが毎回更新扱いになる**。`content_hash` の計算対象から `views` を除外する（§9）。
+- Scrapbox の「関連ページ（2 hop リンク）」に相当する機能は Notion にないので、`links` はプロパティにせず本文末尾の「関連ページ」セクションとして展開する（`--related-section`）。relation プロパティで表現する案もあるが、全ページ作成後に relation を張り直す 3rd pass が必要になるので初期スコープから外す。
+
+## 7. Frontmatter 仕様
 
 GFM 側に持たせる。これで `markdown/` 単体でも情報が落ちない。
 
@@ -249,67 +287,95 @@ content_hash: "sha256:ab12…"                    # push 差分判定用
 ---
 ```
 
-## 7. CLI 仕様
+## 8. CLI 仕様
 
 ```bash
-# 1. export（★ローカル実行。要 SCRAPBOX_SID）
+# 0. 投入先データベースを作る（初回のみ。data source id を state に保存）
+sb2n init-db --project <name> --parent <notion-page-id>
+
+# 1. export（★要ネットワーク。要 SCRAPBOX_SID）
 sb2n export --project <name> --out-dir $DATA/raw/<name>
 
-# 2. 変換（★通信なし。この環境/CI で実行可）
+# 2. 変換（★通信なし。この環境でも CI でも実行可）
 sb2n convert --snapshot $DATA/raw/<name>/<ts>.json --data-dir $DATA \
-             [--heading-mode promote|bold] [--skip-assets]
+             [--heading-mode promote|bold] [--related-section] [--skip-assets]
 
-# 3. Notion へ投入（★ローカル実行。要 NOTION_TOKEN）
-sb2n push --project <name> --parent <notion-page-or-datasource-id> \
-          [--dry-run] [--limit N] [--only <slug>] [--force]
+# 3. Notion へ投入 1st pass（★要ネットワーク。要 NOTION_TOKEN）
+sb2n push --project <name> [--dry-run] [--limit N] [--only <slug>] [--force]
 
 # 4. 内部リンク解決（2nd pass）
-sb2n link --project <name>
+sb2n link --project <name> [--dry-run]
 
 # 5. 検証（Notion から読み戻して期待 NFM と差分）
 sb2n verify --project <name> [--sample N]
+
+# 6. 定常運用: 1〜5 を差分だけまとめて回す（Phase 6 / Actions から呼ぶ）
+sb2n sync --project <name> [--dry-run] [--prune]
 ```
 
-環境変数（すべて `.env`、`.gitignore` 済み。**リポジトリには絶対に入れない**）:
+`push` は投入先を `state/<project>/notion-index.json` の `notion_data_source_id` から読む（`init-db` が書く）。**コマンドラインにデフォルトの投入先を持たせない** —— 取り違えると私物が別ワークスペースに出るため。
+
+環境変数（すべて `.env`、`.gitignore` 済み。**リポジトリには絶対に入れない**。Actions では repository secrets）:
 
 | 変数 | 用途 |
 | --- | --- |
-| `SCRAPBOX_SID` | private project の export（`connect.sid`） |
-| `NOTION_TOKEN` | Notion internal integration token |
-| `NOTION_PARENT_ID` | 投入先の親ページ / data source |
+| `SCRAPBOX_SID` | private project の export（`connect.sid`）。**有効期限があるので切れる前提**（§10 #12） |
+| `NOTION_TOKEN` | **個人ワークスペース**の internal integration token |
+| `NOTION_EXPECTED_WORKSPACE_ID` | preflight 検証用。トークンの所属ワークスペースがこれと違えば abort |
 | `SCRAPBOX_DATA_DIR` | `scrapbox-data` の checkout パス |
 
-## 8. 冪等性・再開・状態管理
+## 9. 冪等性・差分同期・状態管理
 
-Scrapbox は数百〜数千ページになりうるので、**途中で落ちる前提**で設計する。
+Scrapbox は数百〜数千ページになりうるので、**途中で落ちる前提**で設計する。加えて Q5（更新を続ける）を選んだので、**1 回きりの移行ではなく繰り返し回るもの**として設計する。
+
+### 9.1 状態ファイル
 
 `state/<project>/notion-index.json`:
 
 ```jsonc
 {
   "project": "<project>",
-  "notion_parent_id": "…",
+  "notion_workspace_id": "…",            // preflight で照合する
+  "notion_database_id": "…",
+  "notion_data_source_id": "…",          // ページ作成時の parent
+  "last_synced_snapshot": "raw/<project>/2026-07-30T120000Z.json",
   "pages": {
-    "5f8a…": {                          // scrapbox page id が主キー
+    "5f8a…": {                           // scrapbox page id が主キー
       "title": "ページタイトル",
       "slug": "…",
       "notion_page_id": "1a2b…",
       "notion_url": "https://www.notion.so/…",
-      "content_hash": "sha256:ab12…",   // push 済み本文のハッシュ
-      "links_resolved": true,           // 2nd pass 完了フラグ
+      "content_hash": "sha256:ab12…",    // push 済み本文のハッシュ
+      "links_resolved": true,            // 2nd pass 完了フラグ
       "pushed_at": "2026-07-30T12:00:00Z",
-      "status": "ok"                    // ok | failed | skipped
+      "status": "ok"                     // ok | failed | archived
     }
   }
 }
 ```
 
-- `content_hash` が一致 → **スキップ**。2 回目以降の実行はほぼ無料。
+- `content_hash` が一致 → **スキップ**。2 回目以降の実行はほぼ無料。差分同期がこれで成り立つ。
+- **ハッシュの計算対象は NFM 本文と同期対象プロパティのみ。`views` と `Synced At` は除外する。** 含めると閲覧数が増えるだけで全ページが更新扱いになり、毎回フル同期になってしまう。
 - 主キーは Scrapbox page id。タイトル変更でも同じ Notion ページを更新できる（タイトルを主キーにすると別ページが増える）。
 - 1 ページ push ごとに state を書き出す（バッチ末尾でまとめて書かない）。落ちても進捗が残る。
 - `status: failed` のページだけ再試行できるようにする。
 
-### 内部リンクを 2 pass にする理由
+### 9.2 差分同期: 追加・更新・リネーム・削除
+
+`sync` は「前回の snapshot」と「今回の snapshot」を Scrapbox page id で突き合わせて 4 分類する。
+
+| 分類 | 判定 | 動作 |
+| --- | --- | --- |
+| **追加** | 今回のみに id がある | ページを作成（1st pass 相当）→ 新規リンクがあるので 2nd pass も回す |
+| **更新** | 両方にあり `content_hash` が変わった | 本文を差し替え（`update_page`）+ プロパティ更新 |
+| **リネーム** | 両方にあり `title` だけ変わった | `Title` プロパティを更新。**Notion ページは作り直さない**。`markdown/` 側はファイル名が変わるので git 上は rename として出る |
+| **削除** | 前回のみに id がある | **アーカイブする（`archived: true`）。ページを削除しない。** `status: "archived"` を記録し、id は state に残す |
+
+削除で **archive を選ぶ理由**: Scrapbox の削除が意図的かどうかスクリプトからは判別できず、Notion 側で加筆されている可能性もある。破壊的操作は避け、`sync --prune` を明示的に付けたときだけ archive する。archive すら望まない場合は何もせずレポートに出すだけにする。
+
+同じ id が復活した場合（archive 済みページに対応する id が再登場）は、archive を解除して更新する。
+
+### 9.3 内部リンクを 2 pass にする理由
 
 Scrapbox は相互リンクの塊なので、A→B のリンクを張る時点で B の Notion page id が必要になる。循環があるので 1 pass では解けない。
 
@@ -318,47 +384,78 @@ Scrapbox は相互リンクの塊なので、A→B のリンクを張る時点�
 
 Scrapbox に存在しないページへのリンク（未作成リンク）は Notion に対応物がないので、**プレーンテキストに落とす**（マーカーだけ外す）。
 
-## 9. リスクと対策
+## 10. リスクと対策
 
 | # | リスク | 対策 |
 | --- | --- | --- |
-| 1 | この環境から `scrapbox.io` / `api.notion.com` / `gyazo.com` が egress 403 | export・画像取得・push はローカル実行。CI は変換とテストのみ。必要ならネットワークポリシー追加を申請 |
+| 1 | この Claude セッションから `scrapbox.io` / `api.notion.com` / `gyazo.com` が egress 403 | export・画像取得・push はローカルまたは GitHub Actions で実行（Actions のランナーには制約が及ばない）。この環境では変換とテストのみ回す |
 | 2 | Notion レート制限（3 req/s） | トークンバケットで送出、429 は `Retry-After` を尊重した指数バックオフ。全体で ~2.5 req/s を上限に |
 | 3 | 100 要素 / 2,000 文字 / 500KB の制限 | 長いページは `create` + 複数回 `append` に分割。2,000 文字超のテキスト run は分割。ブロック数を事前に見積もって切る |
 | 4 | Markdown API の `Notion-Version` が不確定 | Phase 3 冒頭に **1 ページだけ実 POST する spike** を置いて確定させる。ここで NFM のパイプテーブル受理可否も同時に確認 |
-| 5 | 画像: `scrapbox-data` が private なので `raw.githubusercontent.com` URL は Notion から見えない | Notion の file upload / MCP `create-attachment` でアップロードし、返る URL を使う。フォールバックは gyazo URL 直参照（gyazo の公開範囲・可用性に依存するので非推奨） |
+| 5 | 画像: `scrapbox-data` が private なので `raw.githubusercontent.com` URL は Notion から見えない | Notion の file upload API でアップロードし、返る URL を使う。アップロード済み画像は sha256 → Notion file id を `state/assets.json` に記録して再アップロードを避ける。フォールバックは gyazo URL 直参照（可用性に依存するので非推奨） |
 | 6 | gyazo 画像が非公開で認証なしに落とせない | export 時と同じセッションを使う。落とせないものは `assets/MISSING.md` に記録して移行を止めない |
 | 7 | タイトル → ファイル名（`/ ? * : \| < > \` 空白、Unicode、macOS/Windows の大文字小文字衝突） | 危険文字のみ percent-encoding で**可逆**に。衝突時は `-2` サフィックス。対応は `state/index.json` で持つ（推測に頼らない） |
 | 8 | Scrapbox の「関連ページ（2 hop リンク）」が Notion に無い | frontmatter の `links` を元に、ページ末尾へ「関連ページ」セクションを自動生成（`--related-section` フラグ） |
 | 9 | 変換ミスに気づかないまま数千ページ流し込む | Phase 3 で 10 ページのパイロット → 目視 → マッピング修正。`--dry-run` を全コマンドに用意 |
-| 10 | 個人メモを会社ワークスペース（スリーシェイク）に入れてしまう | Phase 0 で投入先を明示的に確定（→ §11 Q2）。`push` は `--parent` 必須（デフォルト値を作らない） |
+| 10 | 個人メモを会社ワークスペース（スリーシェイク）に入れてしまう | 投入先は**個人ワークスペース**に確定済み。加えて #11 の preflight で機械的に防ぐ |
+| 11 | `NOTION_TOKEN` を取り違えて別ワークスペースへ書き込む | `push` / `link` / `sync` の先頭で `GET /v1/users/me` を叩き、workspace id が `NOTION_EXPECTED_WORKSPACE_ID`（および state の `notion_workspace_id`）と一致しなければ **1 件も書かずに abort**。書き込み前に必ず通す |
+| 12 | `SCRAPBOX_SID` の有効期限切れで定期同期が黙って壊れる | `export` は認証失敗（ログイン HTML が返る等）を JSON パース前に検知して**明示的に失敗させる**。Actions ではジョブを fail させて通知が飛ぶようにする。「0 ページ取得できたので差分なし」と誤認して全ページ削除扱いにするのが最悪パターンなので、**取得ページ数が前回より一定割合以上減ったら abort する sanity check** を入れる |
+| 13 | 差分同期が Scrapbox の削除を検知して Notion 側の加筆を消す | 削除は archive のみ・`--prune` 明示時のみ（§9.2）。ページ削除は行わない |
 
-## 10. フェーズ計画
+## 11. フェーズ計画
 
 | Phase | 内容 | 完了条件 | 実行場所 |
 | --- | --- | --- | --- |
-| **0** | 未決定事項の確定（§11） | Q1–Q6 に回答がある | — |
+| **0** | 残る判断事項の確定（§12） | Q1・Q4・Q6 が確定 | — |
 | **1** | `scrapbox-data` の骨組み + export | `raw/<project>/<ts>.json` が commit 済み。実 JSON でスキーマ確定 | ローカル |
-| **2** | parse → IR → GFM + 画像取得 | `markdown/` が commit され GitHub 上で読める。記法ごとの fixture テストが green | 変換は CI 可 / 画像取得はローカル |
-| **3** | NFM renderer + **10 ページのパイロット** | Notion 上で 10 ページを目視確認 → マッピング修正が反映済み。`Notion-Version` 確定 | ローカル |
+| **2** | parse → IR → GFM + 画像取得 | `markdown/` が commit され GitHub 上で読める。記法ごとの fixture テストが green | 変換はこの環境可 / 画像取得はローカル |
+| **3** | `init-db` + NFM renderer + **10 ページのパイロット** | Notion 上で 10 ページを目視確認 → マッピング修正が反映済み。`Notion-Version` 確定。preflight が機能することを確認 | ローカル |
 | **4** | 全ページ移行（1st pass） | 全ページ `status: ok`。失敗ページ一覧が出る | ローカル |
 | **5** | 内部リンク解決（2nd pass） | `links_resolved: true` が全ページ。未解決リンクが一覧化 | ローカル |
-| **6** | 検証と運用 | `verify` の差分がレビュー済み。（任意）定期 export → 差分 PR の Actions | CI |
+| **6** | **差分同期の自動化**（Q5 で必須になった） | `sync` が追加・更新・リネーム・削除の 4 分類を正しく扱う。`scrapbox-data` の Actions で定期実行され、`raw/` `markdown/` `notion/` `state/` の更新が PR として出る。`verify` の差分がレビュー済み | GitHub Actions |
 
 Phase 2 で一度止まって GitHub 上の Markdown をレビューできるのが、この 2 段構成の一番の利点。Notion に流す前に変換品質を確定できる。
 
-## 11. 未決定事項（要判断）
+### Phase 6 の構成（Q5 = 更新を続ける）
+
+ワークフローは `scrapbox-data` 側に置く（データがそこにあり、secrets もそこに置くのが自然）。`scrapbox2notion` は public なので checkout するだけで使える。
+
+```yaml
+# scrapbox-data/.github/workflows/sync.yml （骨子）
+on:
+  schedule: [{cron: "17 3 * * *"}]   # 毎日 1 回
+  workflow_dispatch:
+jobs:
+  sync:
+    steps:
+      - uses: actions/checkout@v4                      # scrapbox-data
+      - uses: actions/checkout@v4                      # ツール
+        with: {repository: pollenjp/scrapbox, path: .tool}
+      - run: npm ci && npm run build
+        working-directory: .tool/scrapbox2notion
+      - run: sb2n sync --project "$PROJECT"
+        env:
+          SCRAPBOX_SID: ${{ secrets.SCRAPBOX_SID }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_EXPECTED_WORKSPACE_ID: ${{ secrets.NOTION_EXPECTED_WORKSPACE_ID }}
+      - uses: peter-evans/create-pull-request@v6       # 差分を PR にする
+```
+
+**同期結果を直 push ではなく PR にする**のが要点。`markdown/` の diff が「Scrapbox 側で何が変わったか」のレビュー可能な記録になり、変換ロジックのリグレッションにも気づける。`state/` の変更も同じ PR に乗るので、Notion 側に何をしたかが追える。
+
+## 12. 判断事項
+
+確定済み（→ 冒頭「決定事項」）: **Q2 個人ワークスペース** / **Q3 データベース** / **Q5 更新を続ける（差分同期あり）**。
+
+残るもの:
 
 | # | 内容 | 推奨 |
 | --- | --- | --- |
-| **Q1** | Scrapbox のプロジェクト名。複数あるか | ディレクトリを project 単位で切ってあるので複数可 |
-| **Q2** | Notion の投入先。MCP は会社ワークスペース「スリーシェイク」に繋がっているが、個人メモをそこに入れる想定か？ 個人ワークスペースなら別途トークンが必要 | **明示的に確定させる**。取り違えると私物が社内に出る |
-| **Q3** | Notion 側の構造: (a) 親ページ配下のフラットな子ページ / (b) データベース（タイトル・作成日・更新日・タグをプロパティ化） | **(b) データベース**。作成日やタグでフィルタ・ソートでき、Scrapbox の探索性を一番よく再現できる |
+| **Q1** | Scrapbox のプロジェクト名。複数あるか | ディレクトリを project 単位で切ってあるので複数可。Phase 1 で必要 |
 | **Q4** | 画像: Notion にアップロード / gyazo URL 直参照 | **アップロード**。`scrapbox-data` が private なので GitHub 経由の参照は使えず、gyazo 直参照は将来切れる |
-| **Q5** | 移行後の Scrapbox: 凍結して読み取り専用か、更新を続けて差分同期するか | 差分同期まで要るなら Phase 6 の Actions を本気で作る。凍結なら 1 回で終わり |
-| **Q6** | 実装言語 | **TypeScript / Node 22**。既存 `bookmarklet/` が TS で揃えられる。何より [`@progfay/scrapbox-parser`](https://github.com/progfay/scrapbox-parser) という実績あるパーサをそのまま使える（記法パーサを自作しないのが最大のリスク削減）。Rust の [`sb2ofmd`](https://github.com/uni-3/sb2ofmd) は Obsidian 向けだが変換ルールの参考になる |
+| **Q6** | 実装言語 | **TypeScript / Node 22**。既存 `bookmarklet/` と揃うことより、[`@progfay/scrapbox-parser`](https://github.com/progfay/scrapbox-parser) という実績あるパーサをそのまま使える点が大きい（記法パーサを自作しないのが最大のリスク削減）。Rust の [`sb2ofmd`](https://github.com/uni-3/sb2ofmd) は Obsidian 向けだが変換ルールの参考になる |
 
-## 12. 参考
+## 13. 参考
 
 - [Importing and exporting data - Cosense Help](https://scrapbox.io/help/Importing_and_exporting_data)
 - [scrapbox json data - takker](https://scrapbox.io/takker/scrapbox_json_data)
