@@ -1,5 +1,93 @@
 const project_name = "pollenJP-Memo"
 
+/*********************************
+ * Notion の制限に収めるための層 *
+ *********************************/
+
+/**
+ * Scrapbox のページタイトル長の上限（UTF-16 code unit 基準）。
+ *
+ * 実データ 54,589 ページの最大値がちょうど 240 で、サロゲートペアを含む
+ * タイトル（例: codepoint 215 / code unit 240）も 240 で頭打ちだったので
+ * UTF-16 基準と判断した。
+ */
+const SCRAPBOX_TITLE_LIMIT = 240
+
+/**
+ * Notion の url プロパティの上限。
+ *
+ * Scrapbox への逆リンクをここに入れるので、超えると Notion 側で URL を
+ * まるごと落とすしかなくなる。
+ */
+const NOTION_URL_LIMIT = 2000
+
+const SCRAPBOX_PAGE_URL_PREFIX = `https://scrapbox.io/${encodeURIComponent(project_name)}/`
+
+/**
+ * Notion の markdown パーサが弾く文字を落とす。
+ *
+ * - C0 制御文字: 端末ログを選択コピーすると ANSI escape が紛れる
+ * - U+200B (ZWSP) / U+FEFF (BOM): Web ページ、特に日本語サイトに紛れる
+ *
+ * どちらも Notion に投げると `Failed to parse markdown content` で 400 になる。
+ * 移行時に本文 42 ページ・タイトル 14 ページで実際に踏んだ。
+ *
+ * ZWJ (U+200D) は絵文字の合成に要るので残す。tab と改行も残す。
+ */
+function stripUnsupportedChars(s: string): string {
+  /* eslint-disable-next-line no-control-regex */
+  return s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u200B\uFEFF]/g, "")
+}
+
+/**
+ * サロゲートペアを割らない slice。
+ *
+ * 素の `slice` は上限がペアの途中に落ちると片割れだけ残す。孤立サロゲートは
+ * `encodeURIComponent` が URIError で撥ねるため、bookmarklet 自体が落ちる。
+ * 絵文字入りタイトルは実データで 316 件あり、その多くが上限ちょうどに当たる。
+ */
+function sliceKeepingSurrogatePairs(s: string, limit: number): string {
+  if (s.length <= limit) {
+    return s
+  }
+  const code = s.charCodeAt(limit - 1)
+  /* 末尾が高位サロゲートなら、ペアを割っているので 1 つ手前で切る */
+  const end = code >= 0xd800 && code <= 0xdbff ? limit - 1 : limit
+  return s.slice(0, end)
+}
+
+/**
+ * タイトルを Scrapbox と Notion の**両方**の上限に収める。
+ *
+ * Scrapbox の URL は `.../<percent-encoded title>` なので、日本語 1 文字が
+ * 9 文字に膨らむ。Scrapbox 上限いっぱいの 240 文字だと URL は 2,100 文字を
+ * 超え、Notion の url プロパティに入らない（実データで 1 件踏んだ）。
+ *
+ * `suffix` は必ず残し、本体の末尾だけを削る。ホスト名などの識別子が
+ * 先に消えると、ページの同一性が分からなくなるため。
+ */
+function fitTitle(title: string, suffix = ""): string {
+  const tail = stripUnsupportedChars(suffix)
+  let head = sliceKeepingSurrogatePairs(
+    stripUnsupportedChars(title),
+    Math.max(0, SCRAPBOX_TITLE_LIMIT - tail.length)
+  )
+
+  const budget = NOTION_URL_LIMIT - SCRAPBOX_PAGE_URL_PREFIX.length
+  while (head.length > 0) {
+    const over = encodeURIComponent(head + tail).length - budget
+    if (over <= 0) {
+      break
+    }
+    /* 1 文字は最大 12 文字に膨らむ。ざっくり削ってから 1 文字ずつ詰める */
+    head = sliceKeepingSurrogatePairs(
+      head,
+      Math.max(0, head.length - Math.max(1, Math.floor(over / 12)))
+    )
+  }
+  return head + tail
+}
+
 /**
  * data class
  */
@@ -13,11 +101,11 @@ class ParsedData {
   }
 
   get title() {
-    return this._title.slice(0, 240)
+    return fitTitle(this._title)
   }
 
   get body() {
-    return this._body
+    return this._body.map(stripUnsupportedChars)
   }
 }
 
@@ -60,25 +148,19 @@ function returnTitlePathPart(path: string): string {
 }
 
 /**
+ * `<title> (<hostname>)` の形に整えつつ、Scrapbox / Notion の上限に収める。
  *
+ * 本文中のページリンク（`[...]`）にも同じ関数を使うので、ここで作る文字列は
+ * `ParsedData.title` と**同じ規則**で切り詰まる必要がある。ずれるとリンク先が
+ * 存在しないページになる。だから両方 `fitTitle` に寄せている。
  */
 function safeWrapTitle(title: string, hostname: string) {
   if (title.endsWith(`(${hostname})`)) {
-    return title
+    /* 既に付いている場合も、整形だけは通す。ここを素通りさせると本文 1 行目
+       （`unshift` した title）と URL のタイトルがずれ、別ページになる。 */
+    return fitTitle(title)
   }
-
-  /**
-   * 240 文字制限: * scrapbox の title 長さ制限に引っかかるときがある
-   */
-  const length_limit = 240
-
-  const title_try = `${title} (${hostname})`
-  if (title_try.length <= length_limit) {
-    return title_try
-  }
-
-  const over_length = title_try.length - length_limit
-  return `${title.slice(0, title.length - over_length)} (${hostname})`
+  return fitTitle(title, ` (${hostname})`)
 }
 
 function getTwitterImageUrls(imageElems: HTMLImageElement[]): URL[] {
