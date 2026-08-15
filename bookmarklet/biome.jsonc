@@ -1,0 +1,59 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.8/schema.json",
+
+  // 対象は TypeScript のソースだけ。js/ には
+  //   - scripts/build.sh が生成した minify 済みの成果物
+  //   - TypeScript 化していない手書き bookmarklet
+  // の 2 種類しか無く、どちらも整形にかけてはいけない。
+  "files": {
+    "includes": ["src/**/*.ts"]
+  },
+
+  // .prettierrc.yml から移植 (printWidth: 100 / semi: false)。
+  // 残りは prettier 2 の既定に合わせてある。
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "semicolons": "asNeeded",
+      "quoteStyle": "double",
+      // prettier 2 の既定は "es5" だが、既存ソースは末尾カンマを持たない。
+      // "es5" にすると移行と関係の無い差分がファイル全体に出るので合わせた。
+      "trailingCommas": "none"
+    }
+  },
+
+  // .eslintrc.yml (eslint:recommended + @typescript-eslint/recommended) から移植。
+  //
+  // biome の recommended はそれより広く、以前は検知されていなかった規則が
+  // 既存コードに当たる。ここでやっているのは道具の入れ替えであってコードの
+  // 手入れではないので、当時と同じ強さまで落としてある。
+  // 直す気になったら個別に "error" へ上げること。
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        // eqeqeq は eslint:recommended に入っていない。`==` は 8 箇所あり
+        // すべて同じ型どうしの比較なので、直しても挙動は変わらない。
+        // ただし minify 結果まで変わり、道具入れ替えの検証がしづらくなる。
+        "noDoubleEquals": "off"
+      },
+      "correctness": {
+        // @typescript-eslint/recommended では warn だった (no-unused-vars)。
+        // 未使用の DOM ヘルパが 4 つ残っているが、消すのはこの移行の範囲外。
+        "noUnusedVariables": "warn"
+      },
+      "complexity": {
+        // prefer-arrow-callback は eslint:recommended に入っていない
+        "useArrowFunction": "off",
+        // 対応する eslint の規則が無い
+        "noUselessSwitchCase": "off"
+      }
+    }
+  }
+}
