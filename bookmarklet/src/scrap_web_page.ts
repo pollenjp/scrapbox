@@ -35,7 +35,7 @@ const SCRAPBOX_PAGE_URL_PREFIX = `https://scrapbox.io/${encodeURIComponent(proje
  * ZWJ (U+200D) は絵文字の合成に要るので残す。tab と改行も残す。
  */
 function stripUnsupportedChars(s: string): string {
-  /* eslint-disable-next-line no-control-regex */
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: 制御文字を落とすのがこの関数の仕事
   return s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u200B\uFEFF]/g, "")
 }
 
